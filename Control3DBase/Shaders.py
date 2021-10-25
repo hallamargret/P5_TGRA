@@ -82,7 +82,7 @@ class Shader3D:
     def set_light_position(self, pos):
         glUniform4f(self.lightPosLoc, pos.x, pos.y, pos.z, 1.0)
     
-    '''Doing all three in one function, setting the light´s position, diffuse, specular and wheter it is a directional or positional light'''
+    '''Doing all three in one function, setting the lights position, diffuse, specular and wheter it is a directional or positional light'''
     def set_light_pos_diff_spec(self, light_index, pos, diff, spec, dir_or_pos_light):
         glUniform4f(self.lightsPosLocs[light_index], pos.x, pos.y, pos.z, dir_or_pos_light)
         glUniform4f(self.lightsDiffuseLocs[light_index], diff[0], diff[1], diff[2], dir_or_pos_light)

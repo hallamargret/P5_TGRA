@@ -74,23 +74,23 @@ class GraphicsProgram3D:
 
         # Cubes that are moving in the maze, the player will collide on them, set as hindrance
         moving_cube_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(14, 1, 2), Vector(0, 0, 0), Vector(1.0, 1.0, 1.0), (1, 0, 0))
-        moving_cube_1.add_behavior(MoveOnZ(moving_cube_1, 0.4, 3.9))
-        moving_cube_2 = GameObject(self.cube, self.shader, self.model_matrix, Vector(14, 1, 8), Vector(0, 0, 0), Vector(1.0, 1.0, 1.0), (1, 0, 0))
-        moving_cube_2.add_behavior(MoveOnX(moving_cube_2, 12.1, 15.9))
-        moving_cube_3 = GameObject(self.cube, self.shader, self.model_matrix, Vector(2, 1, 12), Vector(0, 0, 0), Vector(1.0, 1.0, 1.0), (1, 0, 0))
-        moving_cube_3.add_behavior(MoveOnX(moving_cube_3, 0.4, 3.9))
+        # moving_cube_1.add_behavior(MoveOnZ(moving_cube_1, 0.4, 3.9))
+        # moving_cube_2 = GameObject(self.cube, self.shader, self.model_matrix, Vector(14, 1, 8), Vector(0, 0, 0), Vector(1.0, 1.0, 1.0), (1, 0, 0))
+        # moving_cube_2.add_behavior(MoveOnX(moving_cube_2, 12.1, 15.9))
+        # moving_cube_3 = GameObject(self.cube, self.shader, self.model_matrix, Vector(2, 1, 12), Vector(0, 0, 0), Vector(1.0, 1.0, 1.0), (1, 0, 0))
+        # moving_cube_3.add_behavior(MoveOnX(moving_cube_3, 0.4, 3.9))
 
-        self.moving_cubes = [moving_cube_1, moving_cube_2, moving_cube_3]
+        self.moving_cubes = [moving_cube_1]
 
         # Player should try to collect all of the end cubes, when all are collected the player will win the game
         end_cube_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(18, 1, 18), Vector(0, 0, 0), Vector(1, 1, 1), (1, 0, 1))
-        end_cube_2 = GameObject(self.cube, self.shader, self.model_matrix, Vector(18, 1, 8), Vector(0, 0, 0), Vector(1, 1, 1), (1, 0, 1))
-        end_cube_3 = GameObject(self.cube, self.shader, self.model_matrix, Vector(6, 1, 11), Vector(0, 0, 0), Vector(1, 1, 1), (1, 0, 1))
-        end_cube_4 = GameObject(self.cube, self.shader, self.model_matrix, Vector(12, 1, 18), Vector(0, 0, 0), Vector(1, 1, 1), (1, 0, 1))
+        # end_cube_2 = GameObject(self.cube, self.shader, self.model_matrix, Vector(18, 1, 8), Vector(0, 0, 0), Vector(1, 1, 1), (1, 0, 1))
+        # end_cube_3 = GameObject(self.cube, self.shader, self.model_matrix, Vector(6, 1, 11), Vector(0, 0, 0), Vector(1, 1, 1), (1, 0, 1))
+        # end_cube_4 = GameObject(self.cube, self.shader, self.model_matrix, Vector(12, 1, 18), Vector(0, 0, 0), Vector(1, 1, 1), (1, 0, 1))
 
         self.current_end_cube = 0
 
-        self.end_cubes = [end_cube_1, end_cube_2, end_cube_3, end_cube_4]
+        self.end_cubes = [end_cube_1]
 
         for cube in self.end_cubes:
             cube.add_behavior(Spin(cube))
@@ -107,23 +107,6 @@ class GraphicsProgram3D:
         self.walls.append(Wall(Vector(self.maze_size/2, (self.wall_height/2), 0), Vector(self.maze_size, self.wall_height, 0.8)))
         self.walls.append(Wall(Vector(0, (self.wall_height/2), self.maze_size/2), Vector(0.8, self.wall_height, self.maze_size)))
         self.walls.append(Wall(Vector(self.maze_size, (self.wall_height/2), self.maze_size/2), Vector(0.8, self.wall_height, self.maze_size)))
-        # maze walls
-        self.walls.append(Wall(Vector(4, (self.wall_height/2), 1), Vector(0.2, self.wall_height, 2)))
-        self.walls.append(Wall(Vector(4, (self.wall_height/2), 11), Vector(0.2, self.wall_height, 10)))
-        self.walls.append(Wall(Vector(12, (self.wall_height/2), 8), Vector(0.2, self.wall_height, 8)))
-        self.walls.append(Wall(Vector(16, (self.wall_height/2), 7), Vector(0.2, self.wall_height, 6)))
-        self.walls.append(Wall(Vector(14, (self.wall_height/2), 17), Vector(0.2, self.wall_height, 6)))
-        self.walls.append(Wall(Vector(8, (self.wall_height/2), 11), Vector(0.2, self.wall_height, 2)))
-        self.walls.append(Wall(Vector(10, (self.wall_height/2), 17), Vector(0.2, self.wall_height, 2)))
-
-        self.walls.append(Wall(Vector(4, (self.wall_height/2), 4), Vector(8, self.wall_height, 0.2)))
-        self.walls.append(Wall(Vector(8, (self.wall_height/2), 8), Vector(8, self.wall_height, 0.2)))
-        self.walls.append(Wall(Vector(14, (self.wall_height/2), 4), Vector(4, self.wall_height, 0.2)))
-        self.walls.append(Wall(Vector(18, (self.wall_height/2), 10), Vector(4, self.wall_height, 0.2)))
-        self.walls.append(Wall(Vector(6, (self.wall_height/2), 12), Vector(4, self.wall_height, 0.2)))
-        self.walls.append(Wall(Vector(18, (self.wall_height/2), 12), Vector(4, self.wall_height, 0.2)))
-        self.walls.append(Wall(Vector(15, (self.wall_height/2), 14), Vector(2, self.wall_height, 0.2)))
-        self.walls.append(Wall(Vector(10, (self.wall_height/2), 16), Vector(8, self.wall_height, 0.2)))
 
     def draw_maze_floor(self, color_list, translation_list, scale_list):
         self.shader.set_material_diffuse(color_list[0], color_list[1], color_list[2])
@@ -319,7 +302,7 @@ class GraphicsProgram3D:
             scale_list = [self.maze_size, 0.8, self.maze_size]
             self.draw_maze_floor(color, translation_list, scale_list)
 
-            # Maze´s walls in the little map
+            # Mazes walls in the little map
             for wall in self.walls:
                 wall.draw(self.shader, self.model_matrix, self.cube)
 
