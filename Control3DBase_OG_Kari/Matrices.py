@@ -35,50 +35,6 @@ class ModelMatrix:
                 counter += 1
         self.matrix = new_matrix
 
-    def add_translation(self, x, y, z):
-        other_matrix = [1, 0, 0, x,
-                        0, 1, 0, y,
-                        0, 0, 1, z,
-                        0, 0, 0, 1]
-        self.add_transformation(other_matrix)
-    
-    def add_scale(self, Sx, Sy, Sz):
-        other_matrix = [Sx, 0, 0, 0,
-                        0, Sy, 0, 0,
-                        0, 0, Sz, 0,
-                        0, 0, 0, 1]
-        self.add_transformation(other_matrix)
-
-    def add_rotate_x(self, angle):
-        # Radians
-        c = cos(angle)
-        s = sin(angle)
-        other_matrix = [1, 0, 0, 0,
-                        0, c, -s, 0,
-                        0, s, c, 0,
-                        0, 0, 0, 1]
-        self.add_transformation(other_matrix)
-
-    def add_rotate_y(self, angle):
-        # Radians
-        c = cos(angle)
-        s = sin(angle)
-        other_matrix = [c, 0, s, 0,
-                        0, 1, 0, 0,
-                        -s, 0, c, 0,
-                        0, 0, 0, 1]
-        self.add_transformation(other_matrix)
-
-    def add_rotate_z(self, angle):
-        # Radians
-        c = cos(angle)
-        s = sin(angle)
-        other_matrix = [c, -s, 0, 0,
-                        s, c, 0, 0,
-                        0, 0, 1, 0,
-                        0, 0, 0, 1]
-        self.add_transformation(other_matrix)
-
     def add_nothing(self):
         other_matrix = [1, 0, 0, 0,
                         0, 1, 0, 0,
@@ -124,69 +80,6 @@ class ViewMatrix:
 
     ## MAKE OPERATIONS TO ADD LOOK, SLIDE, PITCH, YAW and ROLL ##
     # ---
-    def look(self, eye, center, up):
-        self.eye = eye # Point of origin
-        self.n = (eye - center)
-        self.n.normalize()
-        self.u = up.cross(self.n)
-        self.u.normalize()
-        self.v = self.n.cross(self.u)
-
-    '''Not using the good old slide, modified it to slide_on_floor which is basically walking'''
-    def slide(self, del_u, del_v, del_n):
-        self.eye += self.u * del_u + self.v * del_v + self.n * del_n
-    
-    '''Sliding on the floor (or on the ground). Walking but not sliding in whatever direction we are looking at. 
-    So if the player looks up, she/he/it does not slide upwards, but slides towards on the floor but is still looking up.'''
-    def slide_on_floor(self, del_u, del_n):
-        u = Vector(1, 0, 0)
-        n = Vector(0, 0, 1)
-        u.x = self.u.x * del_u
-        u.z = self.u.z * del_u
-        n.x = self.n.x * del_n
-        n.z = self.n.z * del_n
-        self.eye += u + n
-
-    def roll(self, angle):
-        c = cos(angle)
-        s = sin(angle)
-
-        tmp_u = self.u * c + self.v * s
-        self.v = self.u * -s + self.v * c
-        self.u = tmp_u
-
-    def yaw(self, angle):
-        c = cos(angle)
-        s = sin(angle)
-
-        tmp_u = self.u * c + self.n * s
-        self.n = self.u * -s + self.n * c
-        self.u = tmp_u
-    
-    def yaw_on_floor(self, angle):
-        c = cos(angle)
-        s = sin(angle)
-
-        tmp_u = c * self.u.x + s * self.u.z
-        self.u.z = -s * self.u.x + c * self.u.z
-        self.u.x = tmp_u
-
-        tmp_n = c * self.n.x + s * self.n.z
-        self.n.z = -s * self.n.x + c * self.n.z
-        self.n.x = tmp_n
-
-        tmp_v = c * self.v.x + s * self.v.z
-        self.v.z = -s * self.v.x + c * self.v.z
-        self.v.x = tmp_v
-
-    
-    def pitch(self, angle):
-        c = cos(angle)
-        s = sin(angle)
-
-        tmp_v = self.v * c + self.n * s
-        self.n = self.v * -s + self.n * c
-        self.v = tmp_v
 
     def get_matrix(self):
         minusEye = Vector(-self.eye.x, -self.eye.y, -self.eye.z)
@@ -213,16 +106,6 @@ class ProjectionMatrix:
     ## MAKE OPERATION TO SET PERSPECTIVE PROJECTION (don't forget to set is_orthographic to False) ##
     # ---
 
-    def set_perspective(self, fovy, aspect, near, far):
-        self.near = near
-        self.far = far
-        self.top = near * tan(fovy / 2)
-        self.bottom = -self.top
-        self.right = self.top * aspect
-        self.left = -self.right
-        self.is_orthographic = False
-
-
     def set_orthographic(self, left, right, bottom, top, near, far):
         self.left = left
         self.right = right
@@ -247,17 +130,10 @@ class ProjectionMatrix:
                     0,0,0,1]
 
         else:
-            A = (2 * self.near) / (self.right - self.left)
-            B = (self.right + self.left) / (self.right - self.left)
-            C = (2 * self.near) / (self.top - self.bottom)
-            D = (self.top + self.bottom) / (self.top - self.bottom)
-            E = -(self.far + self.near) / (self.far - self.near)
-            F = -(2 * self.far * self.near) / (self.far - self.near)
-
-            return [A,0,B,0,
-                    0,C,D,0,
-                    0,0,E,F,
-                    0,0,-1,0]
+            pass
+            # Set up a matrix for a Perspective projection
+            ###  Remember that it's a non-linear transformation   ###
+            ###  so the bottom row is different                   ###
 
 
 
@@ -266,6 +142,16 @@ class ProjectionMatrix:
 # shader before you properly implement the ViewMatrix
 # and ProjectionMatrix classes.
 # Feel free to throw it away afterwards!
+
+class ProjectionViewMatrix:
+    def __init__(self):
+        pass
+
+    def get_matrix(self):
+        return [ 0.45052942369783683,  0.0,  -0.15017647456594563,  0.0,
+                -0.10435451285616304,  0.5217725642808152,  -0.3130635385684891,  0.0,
+                -0.2953940042189954,  -0.5907880084379908,  -0.8861820126569863,  3.082884480118567,
+                -0.2672612419124244,  -0.5345224838248488,  -0.8017837257372732,  3.7416573867739413 ]
 
 
 # IDEAS FOR OPERATIONS AND TESTING:
