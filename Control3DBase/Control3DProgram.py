@@ -26,16 +26,18 @@ class GraphicsProgram3D:
 
         self.model_matrix = ModelMatrix()
 
-        self.view_matrix = ViewMatrix()
+        self.view_matrix_player1 = ViewMatrix()
+        self.view_matrix_player2 = ViewMatrix()
         # We start in point 1,1,1 and look at the point in front of us 2,1,2
-        self.view_matrix.look(Point(1, 1, 1), Point(2, 1, 2), Vector(0, 1, 0)) # Game mode
+        self.view_matrix_player1.look(Point(1, 1, 1), Point(10, 1, 2), Vector(0, 1, 0)) # Player 1
+        self.view_matrix_player2.look(Point(20, 1,1), Point(10, 1, 2), Vector(0, 1, 0)) # Player 2
 
         self.overview_matrix = ViewMatrix()
         # overview mode, when o is pressed on the keyboard we see the maze from above in point 10,25,10 which is straight up from the middle of the maze
         self.overview_matrix.look(Point(25, 50, 25), Point(26, 1, 26), Vector(0, 1, 0))
 
         self.wall_height = 6
-        self.maze_size = 50
+        self.track_size = 50
 
         self.near_plane = 0.3
         self.far_plane = 100
@@ -71,6 +73,9 @@ class GraphicsProgram3D:
         # The flashlight is turned off to begin with, to turn it on and off press space
         self.flashlight = False
         self.map = True     #little viewport to see a map in the upper right corner, to turn on and off press p
+    
+        self.car_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(self.view_matrix_player1.eye.x, self.view_matrix_player1.eye.y, self.view_matrix_player1.eye.z), Vector(0,0,0), Vector(2.0, 2.0, 5.0), (1,0,0))
+        self.car_2 = GameObject(self.cube, self.shader, self.model_matrix, Vector(self.view_matrix_player2.eye.x, self.view_matrix_player2.eye.y, self.view_matrix_player2.eye.z), Vector(0,0,0), Vector(2.0, 2.0, 5.0), (0,0,1))
 
         # Cubes that are moving in the maze, the player will collide on them, set as hindrance
         moving_cube_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(14, 1, 2), Vector(0, 0, 0), Vector(1.0, 1.0, 1.0), (1, 0, 0))
@@ -103,10 +108,10 @@ class GraphicsProgram3D:
 
     def add_walls(self):
         #big walls
-        self.walls.append(Wall(Vector(self.maze_size/2, (self.wall_height/2), self.maze_size), Vector(self.maze_size, self.wall_height, 0.8)))
-        self.walls.append(Wall(Vector(self.maze_size/2, (self.wall_height/2), 0), Vector(self.maze_size, self.wall_height, 0.8)))
-        self.walls.append(Wall(Vector(0, (self.wall_height/2), self.maze_size/2), Vector(0.8, self.wall_height, self.maze_size)))
-        self.walls.append(Wall(Vector(self.maze_size, (self.wall_height/2), self.maze_size/2), Vector(0.8, self.wall_height, self.maze_size)))
+        self.walls.append(Wall(Vector(self.track_size/2, (self.wall_height/2), self.track_size), Vector(self.track_size, self.wall_height, 0.8)))
+        self.walls.append(Wall(Vector(self.track_size/2, (self.wall_height/2), 0), Vector(self.track_size, self.wall_height, 0.8)))
+        self.walls.append(Wall(Vector(0, (self.wall_height/2), self.track_size/2), Vector(0.8, self.wall_height, self.track_size)))
+        self.walls.append(Wall(Vector(self.track_size, (self.wall_height/2), self.track_size/2), Vector(0.8, self.wall_height, self.track_size)))
         # maze walls
         self.walls.append(Wall(Vector(10, (self.wall_height/4), 25), Vector(0.2, self.wall_height/2, 30)))
         self.walls.append(Wall(Vector(40, (self.wall_height/4), 25), Vector(0.2, self.wall_height/2, 30)))
@@ -124,60 +129,63 @@ class GraphicsProgram3D:
         self.model_matrix.pop_matrix()
     
     '''Check if the player is colliding any walls or objects, if so it will handle it so the player will slide among the wall/object but not walk througt it'''
-    def check_collision(self, wall):
+    def check_collision(self, wall, view_matrix):
         # check if the eye is to close to the wall (for every wall)
-        if wall.min_x <= self.view_matrix.eye.x <= wall.max_x:
+        if wall.min_x <= view_matrix.eye.x <= wall.max_x:
             # right side of the wall
-            if self.view_matrix.eye.z >= wall.max_z:
-                if (self.view_matrix.eye.z - wall.max_z) <= self.radius:
-                    self.view_matrix.eye.z = wall.max_z + self.radius
+            if view_matrix.eye.z >= wall.max_z:
+                if (view_matrix.eye.z - wall.max_z) <= self.radius:
+                    view_matrix.eye.z = wall.max_z + self.radius
             # left side of the wall
-            elif self.view_matrix.eye.z <= wall.min_z:
-                if (wall.min_z - self.view_matrix.eye.z) <= self.radius:
-                    self.view_matrix.eye.z = wall.min_z - self.radius
+            elif view_matrix.eye.z <= wall.min_z:
+                if (wall.min_z - view_matrix.eye.z) <= self.radius:
+                    view_matrix.eye.z = wall.min_z - self.radius
             
-        elif wall.min_z <= self.view_matrix.eye.z <= wall.max_z:
+        elif wall.min_z <= view_matrix.eye.z <= wall.max_z:
             # right side of the wall
-            if self.view_matrix.eye.x >= wall.max_x:
-                if (self.view_matrix.eye.x - wall.max_x) <= self.radius:
-                    self.view_matrix.eye.x = wall.max_x + self.radius
+            if view_matrix.eye.x >= wall.max_x:
+                if (view_matrix.eye.x - wall.max_x) <= self.radius:
+                    view_matrix.eye.x = wall.max_x + self.radius
             # left side of the wall
-            elif self.view_matrix.eye.x <= wall.min_x:
-                if (wall.min_x - self.view_matrix.eye.x) <= self.radius:
-                    self.view_matrix.eye.x = wall.min_x - self.radius
+            elif view_matrix.eye.x <= wall.min_x:
+                if (wall.min_x - view_matrix.eye.x) <= self.radius:
+                    view_matrix.eye.x = wall.min_x - self.radius
         
         else: # Check corners
             upper_left_corner = Point(wall.min_x, 1, wall.max_z)
             upper_right_corner = Point(wall.max_x, 1, wall.max_z)
             lower_left_corner = Point(wall.min_x, 1, wall.min_z)
             lower_right_corner = Point(wall.max_x, 1, wall.min_z)
-            upper_left_dist = self.view_matrix.eye - upper_left_corner # Upper left corner
+            upper_left_dist = view_matrix.eye - upper_left_corner # Upper left corner
             if upper_left_dist.__len__() < self.radius:
                 upper_left_dist.normalize()
                 new_dist = upper_left_dist * self.radius # Set the length of distance vector to the length of the radius
-                self.view_matrix.eye = upper_left_corner + new_dist
-            upper_right_dist = self.view_matrix.eye - upper_right_corner # Upper right corner
+                view_matrix.eye = upper_left_corner + new_dist
+            upper_right_dist = view_matrix.eye - upper_right_corner # Upper right corner
             if upper_right_dist.__len__() < self.radius:
                 upper_right_dist.normalize()
                 new_dist = upper_right_dist * self.radius # Set the length of distance vector to the length of the radius
-                self.view_matrix.eye = upper_right_corner + new_dist
-            lower_left_dist = self.view_matrix.eye - lower_left_corner # lower left corner
+                view_matrix.eye = upper_right_corner + new_dist
+            lower_left_dist = view_matrix.eye - lower_left_corner # lower left corner
             if lower_left_dist.__len__() < self.radius:
                 lower_left_dist.normalize()
                 new_dist = lower_left_dist * self.radius # Set the length of distance vector to the length of the radius
-                self.view_matrix.eye = lower_left_corner + new_dist
-            lower_right_dist = self.view_matrix.eye - lower_right_corner # Lower right corner
+                view_matrix.eye = lower_left_corner + new_dist
+            lower_right_dist = view_matrix.eye - lower_right_corner # Lower right corner
             if lower_right_dist.__len__() < self.radius:
                 lower_right_dist.normalize()
                 new_dist = lower_right_dist * self.radius # Set the length of distance vector to the length of the radius
-                self.view_matrix.eye = lower_right_corner + new_dist
+                view_matrix.eye = lower_right_corner + new_dist
 
     def check_moving_cube_collision(self):
         for cube in self.moving_cubes:
-            self.check_collision(cube)
+            self.check_collision(cube, self.view_matrix_player1)
+            self.check_collision(cube, self.view_matrix_player2)
 
-    def check_spinning_cube_collision(self):
-        distance_vector = self.view_matrix.eye - self.end_cubes[self.current_end_cube].translation
+
+    # TODO taka þetta út?
+    def check_spinning_cube_collision(self, view_matrix):
+        distance_vector = view_matrix.eye - self.end_cubes[self.current_end_cube].translation
         if distance_vector.__len__() < (self.radius + 0.3):
             if self.current_end_cube < (len(self.end_cubes) - 1):
                 self.current_end_cube += 1
@@ -191,32 +199,28 @@ class GraphicsProgram3D:
 
         if not self.overview:
             if self.W_key_down:
-                self.view_matrix.slide_on_floor(0, -4 * delta_time)
+                self.view_matrix_player1.slide_on_floor(0, -4 * delta_time)
             if self.S_key_down:
-                self.view_matrix.slide_on_floor(0, 4 * delta_time)
+                self.view_matrix_player1.slide_on_floor(0, 4 * delta_time)
             if self.A_key_down:
-                self.view_matrix.slide_on_floor(-4 * delta_time, 0)
+                self.view_matrix_player1.yaw_on_floor(pi * delta_time)
             if self.D_key_down:
-                self.view_matrix.slide_on_floor(4 * delta_time, 0)
+                self.view_matrix_player1.yaw_on_floor(-pi * delta_time)
+
+
             if self.T_key_down:
                 self.fov -= 0.1 * delta_time
             if self.G_key_down:
                 self.fov += 0.1 * delta_time
 
             if self.UP_key_down:
-                if self.pitch_angle <= (pi/6):
-                    angle = pi * delta_time
-                    self.pitch_angle += angle
-                    self.view_matrix.pitch(angle)
+                self.view_matrix_player2.slide_on_floor(0, -4 * delta_time)
             if self.DOWN_key_down:
-                if self.pitch_angle >= -(pi/6):
-                    angle = -pi * delta_time
-                    self.pitch_angle += angle
-                    self.view_matrix.pitch(angle)
+                self.view_matrix_player2.slide_on_floor(0, 4 * delta_time)
             if self.LEFT_key_down:
-                self.view_matrix.yaw_on_floor(pi * delta_time)
+                self.view_matrix_player2.yaw_on_floor(pi * delta_time)
             if self.RIGHT_key_down:
-                self.view_matrix.yaw_on_floor(-pi * delta_time)
+                self.view_matrix_player2.yaw_on_floor(-pi * delta_time)
 
         self.end_cubes[self.current_end_cube].update(delta_time)
 
@@ -225,32 +229,23 @@ class GraphicsProgram3D:
 
 
         for wall in self.walls:
-            self.check_collision(wall)
+            self.check_collision(wall, self.view_matrix_player1)
+            self.check_collision(wall, self.view_matrix_player2)
 
         self.check_moving_cube_collision()
-        self.check_spinning_cube_collision()
+        self.check_spinning_cube_collision(self.view_matrix_player1)
+        self.check_spinning_cube_collision(self.view_matrix_player2)
+
+        self.car_1.translation = Vector(self.view_matrix_player1.eye.x, self.view_matrix_player1.eye.y, self.view_matrix_player1.eye.z)
+        self.car_2.translation = Vector(self.view_matrix_player2.eye.x, self.view_matrix_player2.eye.y, self.view_matrix_player2.eye.z)
+
+        self.check_collision(self.car_1, self.view_matrix_player2)
+        self.check_collision(self.car_2, self.view_matrix_player1)
     
-    
 
-    def display(self):
-        glEnable(GL_DEPTH_TEST)
-
-        glClearColor(0.0, 0.2, 0.8, 1.0)    #color of space (sky)
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
-
-        glViewport(0, 0, 800, 600)
-
-        self.projection_matrix.set_perspective((self.fov), (800 / 600), self.near_plane, self.far_plane)
-        self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
-
-        # View the maze from above to see the whole maze. Not able to move while in overview mode, only look.
-        if self.overview:
-            self.shader.set_view_matrix(self.overview_matrix.get_matrix())
-            self.shader.set_eye_position(self.overview_matrix.eye)
-        # Game mode (first person view), viewing the matrix as the player. Move (walk forward, to the right, left and backwards) and look around for end cubes.
-        else:
-            self.shader.set_view_matrix(self.view_matrix.get_matrix())
-            self.shader.set_eye_position(self.view_matrix.eye)
+    def display_player(self, view_matrix, player):
+        self.shader.set_view_matrix(view_matrix.get_matrix())
+        self.shader.set_eye_position(view_matrix.eye)
 
         # first light  (positional)
         self.shader.set_light_pos_diff_spec(0, Point(10, 15, 0), (0.5, 0.5, 0.5), (0.4, 0.4, 0.4), 1.0)
@@ -266,9 +261,9 @@ class GraphicsProgram3D:
 
         # fifth light, flashlight (directional). Turned on when space has been pressed, turns off when space is pressed again.
         if self.flashlight:
-            self.shader.set_light_pos_diff_spec(4, self.view_matrix.n, (0.5, 0.5, 0.1), (0.3, 0.3, 0.3), 0.0)
+            self.shader.set_light_pos_diff_spec(4, view_matrix.n, (0.5, 0.5, 0.1), (0.3, 0.3, 0.3), 0.0)
         else:
-            self.shader.set_light_pos_diff_spec(4, self.view_matrix.n, (0.0, 0.0, 0.0), (0.0, 0.0, 0.0), 0.0)
+            self.shader.set_light_pos_diff_spec(4, view_matrix.n, (0.0, 0.0, 0.0), (0.0, 0.0, 0.0), 0.0)
 
         # fifth light directional fixed position not used but can be replaced for the flashlight (or added to the list but then need some modifycations in the simple3D.vert file)
         #self.shader.set_light_pos_diff_spec(4, Point(1, 1, 1), (0.6, 0.6, 0.6), (0.5, 0.5, 0.5), 0.0)
@@ -281,8 +276,8 @@ class GraphicsProgram3D:
 
         # The maze floor
         color = [0.5, 0.5, 0.7]
-        translation_list = [self.maze_size/2, 0, self.maze_size/2]
-        scale_list = [self.maze_size, 0.8, self.maze_size]
+        translation_list = [self.track_size/2, 0, self.track_size/2]
+        scale_list = [self.track_size, 0.8, self.track_size]
         self.draw_maze_floor(color, translation_list, scale_list)
 
         # Walls of the maze
@@ -294,28 +289,71 @@ class GraphicsProgram3D:
         for cube in self.moving_cubes:
             cube.draw()
 
-        # little map of the maze in another smaller viewport, displays in the upper right corner. Turn off and on with the letter p on keyboard
-        if self.map:
-            glViewport(600, 400, 250, 200)
-            glClear(GL_DEPTH_BUFFER_BIT)
+        if player == 1:
+             self.car_2.draw()
+        else:
+            self.car_1.draw()
+        
+        
+
+
+        #little map of the maze in another smaller viewport, displays in the upper right corner. Turn off and on with the letter p on keyboard
+        # if self.map:
+        #     glViewport(600, 400, 250, 200)
+        #     glClear(GL_DEPTH_BUFFER_BIT)
+        #     self.shader.set_view_matrix(self.overview_matrix.get_matrix())
+        #     self.shader.set_eye_position(self.overview_matrix.eye)
+
+        #     # The maze floor in the little map
+        #     color = [0.2, 0.1, 0.7]
+        #     translation_list = [self.track_size/2, 0, self.track_size/2]
+        #     scale_list = [self.track_size, 0.8, self.track_size]
+        #     self.draw_maze_floor(color, translation_list, scale_list)
+
+        #     # Mazes walls in the little map
+        #     for wall in self.walls:
+        #         wall.draw(self.shader, self.model_matrix, self.cube)
+
+        #     self.end_cubes[self.current_end_cube].draw()
+
+        #     for cube in self.moving_cubes:
+        #         cube.draw()
+
+    
+
+    def display(self):
+        glEnable(GL_DEPTH_TEST)
+
+        glClearColor(0.0, 0.2, 0.8, 1.0)    #color of space (sky)
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+
+        glViewport(0, 300, 800, 300)
+
+        self.projection_matrix.set_perspective((self.fov), (800 / 600), self.near_plane, self.far_plane)
+        self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
+
+        self.display_player(self.view_matrix_player1, 1)
+
+        # View the maze from above to see the whole maze. Not able to move while in overview mode, only look.
+        if self.overview:
             self.shader.set_view_matrix(self.overview_matrix.get_matrix())
             self.shader.set_eye_position(self.overview_matrix.eye)
+        # Game mode (first person view), viewing the matrix as the player. Move (walk forward, to the right, left and backwards) and look around for end cubes.
+        # else:
+        #     #player 1
+        #     self.shader.set_view_matrix(self.view_matrix_player1.get_matrix())
+        #     self.shader.set_eye_position(self.view_matrix_player1.eye)
 
-            # The maze floor in the little map
-            color = [0.2, 0.1, 0.7]
-            translation_list = [self.maze_size/2, 0, self.maze_size/2]
-            scale_list = [self.maze_size, 0.8, self.maze_size]
-            self.draw_maze_floor(color, translation_list, scale_list)
+        
+        glViewport(0, 0, 800, 300)
 
-            # Mazes walls in the little map
-            for wall in self.walls:
-                wall.draw(self.shader, self.model_matrix, self.cube)
+        self.projection_matrix.set_perspective((self.fov), (800 / 600), self.near_plane, self.far_plane)
+        self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
 
-            self.end_cubes[self.current_end_cube].draw()
+        self.display_player(self.view_matrix_player2, 2)
 
-            for cube in self.moving_cubes:
-                cube.draw()
-            
+
+        
 
         pygame.display.flip()
     
@@ -340,8 +378,8 @@ class GraphicsProgram3D:
         self.model_matrix.load_identity()
 
         color = [0.0, 0.0, 0.8]
-        translation_list = [self.maze_size/2, 0, self.maze_size/2]
-        scale_list = [self.maze_size, 0.8, self.maze_size]
+        translation_list = [self.track_size/2, 0, self.track_size/2]
+        scale_list = [self.track_size, 0.8, self.track_size]
         self.draw_maze_floor(color, translation_list, scale_list)
 
         self.create_victory_letters()
