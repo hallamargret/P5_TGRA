@@ -32,10 +32,10 @@ class GraphicsProgram3D:
 
         self.overview_matrix = ViewMatrix()
         # overview mode, when o is pressed on the keyboard we see the maze from above in point 10,25,10 which is straight up from the middle of the maze
-        self.overview_matrix.look(Point(10, 25, 10), Point(11, 1, 10), Vector(0, 1, 0))
+        self.overview_matrix.look(Point(25, 50, 25), Point(26, 1, 26), Vector(0, 1, 0))
 
         self.wall_height = 6
-        self.maze_size = 20
+        self.maze_size = 50
 
         self.near_plane = 0.3
         self.far_plane = 100
@@ -107,6 +107,11 @@ class GraphicsProgram3D:
         self.walls.append(Wall(Vector(self.maze_size/2, (self.wall_height/2), 0), Vector(self.maze_size, self.wall_height, 0.8)))
         self.walls.append(Wall(Vector(0, (self.wall_height/2), self.maze_size/2), Vector(0.8, self.wall_height, self.maze_size)))
         self.walls.append(Wall(Vector(self.maze_size, (self.wall_height/2), self.maze_size/2), Vector(0.8, self.wall_height, self.maze_size)))
+        # maze walls
+        self.walls.append(Wall(Vector(10, (self.wall_height/4), 25), Vector(0.2, self.wall_height/2, 30)))
+        self.walls.append(Wall(Vector(40, (self.wall_height/4), 25), Vector(0.2, self.wall_height/2, 30)))
+        self.walls.append(Wall(Vector(25, (self.wall_height/4), 40), Vector(30, self.wall_height/2, 0.2)))
+        self.walls.append(Wall(Vector(25, (self.wall_height/4), 10), Vector(30, self.wall_height/2, 0.2)))
 
     def draw_maze_floor(self, color_list, translation_list, scale_list):
         self.shader.set_material_diffuse(color_list[0], color_list[1], color_list[2])
@@ -275,7 +280,7 @@ class GraphicsProgram3D:
 
 
         # The maze floor
-        color = [0.2, 0.1, 0.7]
+        color = [0.5, 0.5, 0.7]
         translation_list = [self.maze_size/2, 0, self.maze_size/2]
         scale_list = [self.maze_size, 0.8, self.maze_size]
         self.draw_maze_floor(color, translation_list, scale_list)
