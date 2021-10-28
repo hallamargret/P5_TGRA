@@ -29,8 +29,8 @@ class GraphicsProgram3D:
         self.view_matrix_player1 = ViewMatrix()
         self.view_matrix_player2 = ViewMatrix()
         # We start in point 1,1,1 and look at the point in front of us 2,1,2
-        self.view_matrix_player1.look(Point(1, 1, 1), Point(10, 1, 2), Vector(0, 1, 0)) # Player 1
-        self.view_matrix_player2.look(Point(20, 1,1), Point(10, 1, 2), Vector(0, 1, 0)) # Player 2
+        self.view_matrix_player1.look(Point(1, 2, 1), Point(10, 2, 2), Vector(0, 1, 0)) # Player 1
+        self.view_matrix_player2.look(Point(20, 2,1), Point(10, 2, 2), Vector(0, 1, 0)) # Player 2
 
         self.overview_matrix = ViewMatrix()
         # overview mode, when o is pressed on the keyboard we see the maze from above in point 10,25,10 which is straight up from the middle of the maze
@@ -74,8 +74,8 @@ class GraphicsProgram3D:
         self.flashlight = False
         self.map = True     #little viewport to see a map in the upper right corner, to turn on and off press p
     
-        self.car_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(self.view_matrix_player1.eye.x, self.view_matrix_player1.eye.y, self.view_matrix_player1.eye.z), Vector(0,0,0), Vector(2.0, 2.0, 5.0), (1,0,0))
-        self.car_2 = GameObject(self.cube, self.shader, self.model_matrix, Vector(self.view_matrix_player2.eye.x, self.view_matrix_player2.eye.y, self.view_matrix_player2.eye.z), Vector(0,0,0), Vector(2.0, 2.0, 5.0), (0,0,1))
+        self.car_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(self.view_matrix_player1.eye.x, self.view_matrix_player1.eye.y, self.view_matrix_player1.eye.z), Vector(0,0,0), Vector(5.0, 2.0, 2.0), (1,0,0))
+        self.car_2 = GameObject(self.cube, self.shader, self.model_matrix, Vector(self.view_matrix_player2.eye.x, self.view_matrix_player2.eye.y, self.view_matrix_player2.eye.z), Vector(0,0,0), Vector(5.0, 2.0, 2.0), (0,0,1))
 
         # Cubes that are moving in the maze, the player will collide on them, set as hindrance
         moving_cube_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(14, 1, 2), Vector(0, 0, 0), Vector(1.0, 1.0, 1.0), (1, 0, 0))
@@ -204,8 +204,10 @@ class GraphicsProgram3D:
                 self.view_matrix_player1.slide_on_floor(0, 4 * delta_time)
             if self.A_key_down:
                 self.view_matrix_player1.yaw_on_floor(pi * delta_time)
+                self.car_1.rotation.y += pi * delta_time
             if self.D_key_down:
                 self.view_matrix_player1.yaw_on_floor(-pi * delta_time)
+                self.car_1.rotation.y += -pi * delta_time
 
 
             if self.T_key_down:
@@ -219,8 +221,10 @@ class GraphicsProgram3D:
                 self.view_matrix_player2.slide_on_floor(0, 4 * delta_time)
             if self.LEFT_key_down:
                 self.view_matrix_player2.yaw_on_floor(pi * delta_time)
+                self.car_2.rotation.y += pi * delta_time
             if self.RIGHT_key_down:
                 self.view_matrix_player2.yaw_on_floor(-pi * delta_time)
+                self.car_2.rotation.y += -pi * delta_time
 
         self.end_cubes[self.current_end_cube].update(delta_time)
 
