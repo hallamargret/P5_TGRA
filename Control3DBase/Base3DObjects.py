@@ -104,10 +104,36 @@ class Cube:
                             1.0, 0.0, 0.0,
                             1.0, 0.0, 0.0,
                             1.0, 0.0, 0.0]
+        self.uv_array = [0.0, 0.0,
+                        0.0, 1.0,
+                        1.0, 1.0,
+                        1.0, 0.0,
+                        0.0, 0.0,
+                        0.0, 1.0,
+                        1.0, 1.0,
+                        1.0, 0.0,
+                        0.0, 0.0,
+                        0.0, 1.0,
+                        1.0, 1.0,
+                        1.0, 0.0,
+                        0.0, 0.0,
+                        0.0, 1.0,
+                        1.0, 1.0,
+                        1.0, 0.0,
+                        0.0, 0.0,
+                        0.0, 1.0,
+                        1.0, 1.0,
+                        1.0, 0.0,
+                        0.0, 0.0,
+                        0.0, 1.0,
+                        1.0, 1.0,
+                        1.0, 0.0]
+                       
 
     def set_verticies(self, shader):
         shader.set_position_attribute(self.position_array)
         shader.set_normal_attribute(self.normal_array)
+        shader.set_uv_attribute(self.uv_array)
 
     def draw(self):
         

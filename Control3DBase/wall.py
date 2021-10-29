@@ -5,7 +5,7 @@ class Wall:
     def __init__(self, translation: Vector, scale: Vector):
         self.translation = translation
         self.scale = scale
-        self.color = (0.7, 1.0, 0.4)
+        self.color = (1.0, 1.0, 1.0)
 
         self.min_x = self.translation.x - (self.scale.x)/2
         self.max_x = self.translation.x + (self.scale.x)/2

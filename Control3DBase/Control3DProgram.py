@@ -41,7 +41,8 @@ class GraphicsProgram3D:
 
         self.near_plane = 0.3
         self.far_plane = 100
-        self.walls = []
+        self.x_walls = []
+        self.z_walls = []
         self.radius = 0.8
         
         
@@ -79,19 +80,12 @@ class GraphicsProgram3D:
 
         # Cubes that are moving in the maze, the player will collide on them, set as hindrance
         moving_cube_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(14, 1, 2), Vector(0, 0, 0), Vector(1.0, 1.0, 1.0), (1, 0, 0))
-        # moving_cube_1.add_behavior(MoveOnZ(moving_cube_1, 0.4, 3.9))
-        # moving_cube_2 = GameObject(self.cube, self.shader, self.model_matrix, Vector(14, 1, 8), Vector(0, 0, 0), Vector(1.0, 1.0, 1.0), (1, 0, 0))
-        # moving_cube_2.add_behavior(MoveOnX(moving_cube_2, 12.1, 15.9))
-        # moving_cube_3 = GameObject(self.cube, self.shader, self.model_matrix, Vector(2, 1, 12), Vector(0, 0, 0), Vector(1.0, 1.0, 1.0), (1, 0, 0))
-        # moving_cube_3.add_behavior(MoveOnX(moving_cube_3, 0.4, 3.9))
+    
 
         self.moving_cubes = [moving_cube_1]
 
         # Player should try to collect all of the end cubes, when all are collected the player will win the game
         end_cube_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(18, 1, 18), Vector(0, 0, 0), Vector(1, 1, 1), (1, 0, 1))
-        # end_cube_2 = GameObject(self.cube, self.shader, self.model_matrix, Vector(18, 1, 8), Vector(0, 0, 0), Vector(1, 1, 1), (1, 0, 1))
-        # end_cube_3 = GameObject(self.cube, self.shader, self.model_matrix, Vector(6, 1, 11), Vector(0, 0, 0), Vector(1, 1, 1), (1, 0, 1))
-        # end_cube_4 = GameObject(self.cube, self.shader, self.model_matrix, Vector(12, 1, 18), Vector(0, 0, 0), Vector(1, 1, 1), (1, 0, 1))
 
         self.current_end_cube = 0
 
@@ -106,20 +100,58 @@ class GraphicsProgram3D:
 
         self.has_won = False
 
+        self.texture_id01 = self.load_texture("crowd.png")
+        self.texture_id02 = self.load_texture_rotate("crowd.png")
+        # self.texture_id01 = self.load_texture("dice.png")
+        # surface = pygame.image.load("fence_tex.png")
+        # tex_string = pygame.image.tostring(surface, "RGBA", 1)
+        # width = surface.get_width()
+        # height = surface.get_height()
+        # tex_id = glGenTextures(1)
+        # glBindTexture(GL_TEXTURE_2D, tex_id)
+        # glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_string)
+        # self.texture_id01 = tex_id
+
+    def load_texture(self, path_str):
+        surface = pygame.image.load(path_str)
+        tex_string = pygame.image.tostring(surface, "RGBA", 1)
+        width = surface.get_width()
+        height = surface.get_height()
+        tex_id = glGenTextures(1)
+        glBindTexture(GL_TEXTURE_2D, tex_id)
+        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_string)
+        return tex_id
+    
+    def load_texture_rotate(self, path_str):
+        image = pygame.image.load(path_str)
+        surface = pygame.transform.rotate(image, -90)
+        tex_string = pygame.image.tostring(surface, "RGBA", 1)
+        width = surface.get_width()
+        height = surface.get_height()
+        tex_id = glGenTextures(1)
+        glBindTexture(GL_TEXTURE_2D, tex_id)
+        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_string)
+        return tex_id
+
     def add_walls(self):
         #big walls
-        self.walls.append(Wall(Vector(self.track_size/2, (self.wall_height/2), self.track_size), Vector(self.track_size, self.wall_height, 0.8)))
-        self.walls.append(Wall(Vector(self.track_size/2, (self.wall_height/2), 0), Vector(self.track_size, self.wall_height, 0.8)))
-        self.walls.append(Wall(Vector(0, (self.wall_height/2), self.track_size/2), Vector(0.8, self.wall_height, self.track_size)))
-        self.walls.append(Wall(Vector(self.track_size, (self.wall_height/2), self.track_size/2), Vector(0.8, self.wall_height, self.track_size)))
+        self.z_walls.append(Wall(Vector(self.track_size/2, (self.wall_height/2), self.track_size), Vector(self.track_size, self.wall_height, 0.8)))
+        self.z_walls.append(Wall(Vector(self.track_size/2, (self.wall_height/2), 0), Vector(self.track_size, self.wall_height, 0.8)))
+        self.x_walls.append(Wall(Vector(0, (self.wall_height/2), self.track_size/2), Vector(0.8, self.wall_height, self.track_size)))
+        self.x_walls.append(Wall(Vector(self.track_size, (self.wall_height/2), self.track_size/2), Vector(0.8, self.wall_height, self.track_size)))
         # maze walls
-        self.walls.append(Wall(Vector(10, (self.wall_height/4), 25), Vector(0.2, self.wall_height/2, 30)))
-        self.walls.append(Wall(Vector(40, (self.wall_height/4), 25), Vector(0.2, self.wall_height/2, 30)))
-        self.walls.append(Wall(Vector(25, (self.wall_height/4), 40), Vector(30, self.wall_height/2, 0.2)))
-        self.walls.append(Wall(Vector(25, (self.wall_height/4), 10), Vector(30, self.wall_height/2, 0.2)))
+        self.x_walls.append(Wall(Vector(10, (self.wall_height/4), 25), Vector(0.2, self.wall_height/2, 30)))
+        self.x_walls.append(Wall(Vector(40, (self.wall_height/4), 25), Vector(0.2, self.wall_height/2, 30)))
+        self.z_walls.append(Wall(Vector(25, (self.wall_height/4), 40), Vector(30, self.wall_height/2, 0.2)))
+        self.z_walls.append(Wall(Vector(25, (self.wall_height/4), 10), Vector(30, self.wall_height/2, 0.2)))
 
     def draw_maze_floor(self, color_list, translation_list, scale_list):
-        self.shader.set_material_diffuse(color_list[0], color_list[1], color_list[2])
+        #self.shader.set_material_diffuse(color_list[0], color_list[1], color_list[2])
+        
         self.model_matrix.push_matrix()
         self.model_matrix.add_translation(translation_list[0], translation_list[1], translation_list[2])
         self.model_matrix.add_scale(scale_list[0], scale_list[1], scale_list[2])
@@ -192,6 +224,8 @@ class GraphicsProgram3D:
             else:
                 self.has_won = True
 
+    
+
     def update(self):
         delta_time = self.clock.tick() / 1000.0
 
@@ -232,7 +266,11 @@ class GraphicsProgram3D:
             cube.update(delta_time)
 
 
-        for wall in self.walls:
+        for wall in self.x_walls:
+            self.check_collision(wall, self.view_matrix_player1)
+            self.check_collision(wall, self.view_matrix_player2)
+        
+        for wall in self.z_walls:
             self.check_collision(wall, self.view_matrix_player1)
             self.check_collision(wall, self.view_matrix_player2)
 
@@ -252,22 +290,25 @@ class GraphicsProgram3D:
         self.shader.set_eye_position(view_matrix.eye)
 
         # first light  (positional)
-        self.shader.set_light_pos_diff_spec(0, Point(10, 15, 0), (0.5, 0.5, 0.5), (0.4, 0.4, 0.4), 1.0)
+        #self.shader.set_light_pos_diff_spec(0, Point(10, 15, 0), (0.5, 0.5, 0.5), (0.4, 0.4, 0.4), 1.0)
+        self.shader.set_light_position(Point(25, 25, 25))
+        self.shader.set_light_diffuse(0.5, 0.5, 0.5)
+        self.shader.set_light_specular(0.4, 0.4, 0.4)
         
         # second light (positional)
-        self.shader.set_light_pos_diff_spec(1, Point(10, 15, 20), (0.5, 0.5, 0.5), (0.4, 0.4, 0.4), 1.0)
+        #self.shader.set_light_pos_diff_spec(1, Point(10, 15, 20), (0.5, 0.5, 0.5), (0.4, 0.4, 0.4), 1.0)
         
         # third light (positional)
-        self.shader.set_light_pos_diff_spec(2, Point(0, 15, 10), (0.5, 0.5, 0.5), (0.4, 0.4, 0.4), 1.0)
+        #self.shader.set_light_pos_diff_spec(2, Point(0, 15, 10), (0.5, 0.5, 0.5), (0.4, 0.4, 0.4), 1.0)
         
         # fourth light (positional)
-        self.shader.set_light_pos_diff_spec(3, Point(20, 15, 10), (0.5, 0.5, 0.5), (0.4, 0.4, 0.4), 1.0)
+        #self.shader.set_light_pos_diff_spec(3, Point(20, 15, 10), (0.5, 0.5, 0.5), (0.4, 0.4, 0.4), 1.0)
 
         # fifth light, flashlight (directional). Turned on when space has been pressed, turns off when space is pressed again.
-        if self.flashlight:
-            self.shader.set_light_pos_diff_spec(4, view_matrix.n, (0.5, 0.5, 0.1), (0.3, 0.3, 0.3), 0.0)
-        else:
-            self.shader.set_light_pos_diff_spec(4, view_matrix.n, (0.0, 0.0, 0.0), (0.0, 0.0, 0.0), 0.0)
+        # if self.flashlight:
+        #     self.shader.set_light_pos_diff_spec(4, view_matrix.n, (0.5, 0.5, 0.1), (0.3, 0.3, 0.3), 0.0)
+        # else:
+        #     self.shader.set_light_pos_diff_spec(4, view_matrix.n, (0.0, 0.0, 0.0), (0.0, 0.0, 0.0), 0.0)
 
         # fifth light directional fixed position not used but can be replaced for the flashlight (or added to the list but then need some modifycations in the simple3D.vert file)
         #self.shader.set_light_pos_diff_spec(4, Point(1, 1, 1), (0.6, 0.6, 0.6), (0.5, 0.5, 0.5), 0.0)
@@ -285,16 +326,39 @@ class GraphicsProgram3D:
         self.draw_maze_floor(color, translation_list, scale_list)
 
         # Walls of the maze
-        for wall in self.walls:
+
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id02)
+        self.shader.set_diffuse_tex(0)
+        glActiveTexture(GL_TEXTURE1)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id02)
+        self.shader.set_spec_tex(1)
+
+        for wall in self.x_walls:
             wall.draw(self.shader, self.model_matrix, self.cube)
 
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id01)
+        self.shader.set_diffuse_tex(0)
+        glActiveTexture(GL_TEXTURE1)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id01)
+        self.shader.set_spec_tex(1)
+
+        for wall in self.z_walls:
+            wall.draw(self.shader, self.model_matrix, self.cube)
+
+        glActiveTexture(GL_TEXTURE2)
+
         self.end_cubes[self.current_end_cube].draw()
+
+        
 
         for cube in self.moving_cubes:
             cube.draw()
 
+        
         if player == 1:
-             self.car_2.draw()
+            self.car_2.draw()
         else:
             self.car_1.draw()
         
@@ -331,7 +395,17 @@ class GraphicsProgram3D:
         glClearColor(0.0, 0.2, 0.8, 1.0)    #color of space (sky)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
+        self.shader.set_material_diffuse(1.0, 1.0, 1.0)
+
         glViewport(0, 300, 800, 300)
+
+        # glActiveTexture(GL_TEXTURE0)
+        # glBindTexture(GL_TEXTURE_2D, self.texture_id01)
+        # self.shader.set_diffuse_tex(0)
+        # glActiveTexture(GL_TEXTURE1)
+        # glBindTexture(GL_TEXTURE_2D, self.texture_id01)
+        # self.shader.set_spec_tex(1)
+
 
         self.projection_matrix.set_perspective((self.fov), (800 / 600), self.near_plane, self.far_plane)
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
@@ -350,6 +424,12 @@ class GraphicsProgram3D:
 
         
         glViewport(0, 0, 800, 300)
+        # glActiveTexture(GL_TEXTURE0)
+        # glBindTexture(GL_TEXTURE_2D, self.texture_id02)
+        # self.shader.set_diffuse_tex(0)
+        # glActiveTexture(GL_TEXTURE1)
+        # glBindTexture(GL_TEXTURE_2D, self.texture_id02)
+        # self.shader.set_spec_tex(1)
 
         self.projection_matrix.set_perspective((self.fov), (800 / 600), self.near_plane, self.far_plane)
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
