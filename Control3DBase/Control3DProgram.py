@@ -290,19 +290,19 @@ class GraphicsProgram3D:
         self.shader.set_eye_position(view_matrix.eye)
 
         # first light  (positional)
-        #self.shader.set_light_pos_diff_spec(0, Point(10, 15, 0), (0.5, 0.5, 0.5), (0.4, 0.4, 0.4), 1.0)
-        self.shader.set_light_position(Point(25, 25, 25))
-        self.shader.set_light_diffuse(0.5, 0.5, 0.5)
-        self.shader.set_light_specular(0.4, 0.4, 0.4)
+        self.shader.set_light_pos_diff_spec(0, Point(25, 15, 0), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1.0)
+        # self.shader.set_light_position(Point(25, 25, 25))
+        # self.shader.set_light_diffuse(0.5, 0.5, 0.5)
+        # self.shader.set_light_specular(0.4, 0.4, 0.4)
         
         # second light (positional)
-        #self.shader.set_light_pos_diff_spec(1, Point(10, 15, 20), (0.5, 0.5, 0.5), (0.4, 0.4, 0.4), 1.0)
+        self.shader.set_light_pos_diff_spec(1, Point(25, 15, 50), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1.0)
         
         # third light (positional)
-        #self.shader.set_light_pos_diff_spec(2, Point(0, 15, 10), (0.5, 0.5, 0.5), (0.4, 0.4, 0.4), 1.0)
+        self.shader.set_light_pos_diff_spec(2, Point(0, 15, 25), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1.0)
         
         # fourth light (positional)
-        #self.shader.set_light_pos_diff_spec(3, Point(20, 15, 10), (0.5, 0.5, 0.5), (0.4, 0.4, 0.4), 1.0)
+        self.shader.set_light_pos_diff_spec(3, Point(50, 15, 25), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1.0)
 
         # fifth light, flashlight (directional). Turned on when space has been pressed, turns off when space is pressed again.
         # if self.flashlight:

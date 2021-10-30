@@ -6,6 +6,8 @@ import sys
 
 from Base3DObjects import *
 
+NUMBER_OF_LIGHTS = 4
+
 class Shader3D:
     def __init__(self):
         vert_shader = glCreateShader(GL_VERTEX_SHADER)
@@ -48,20 +50,20 @@ class Shader3D:
 
         self.eyePosLoc                = glGetUniformLocation(self.renderingProgramID, "u_eye_position")
 
-        self.lightPosLoc            = glGetUniformLocation(self.renderingProgramID, "u_light_position")
+        # self.lightPosLoc            = glGetUniformLocation(self.renderingProgramID, "u_light_position")
 
-        self.lightDiffuseLoc = glGetUniformLocation(self.renderingProgramID,  "u_light_diffuse")
-        self.lightSpecularLoc = glGetUniformLocation(self.renderingProgramID,  "u_light_specular")
+        # self.lightDiffuseLoc = glGetUniformLocation(self.renderingProgramID,  "u_light_diffuse")
+        # self.lightSpecularLoc = glGetUniformLocation(self.renderingProgramID,  "u_light_specular")
 
-        # self.lightsPosLocs = []     #list of the locations of the positions of all the lights
-        # self.lightsDiffuseLocs = []     #list of the locations of the diffuse of all the lights
-        # self.lightsSpecularLocs = []    #list of the locations of the specular of all the lights
-        # number_of_lights = 5
+        self.lightsPosLocs = []     #list of the locations of the positions of all the lights
+        self.lightsDiffuseLocs = []     #list of the locations of the diffuse of all the lights
+        self.lightsSpecularLocs = []    #list of the locations of the specular of all the lights
+        
 
-        # for i in range(number_of_lights):
-        #     self.lightsPosLocs.append(glGetUniformLocation(self.renderingProgramID, "lights[" + str(i) + "].position"))
-        #     self.lightsDiffuseLocs.append(glGetUniformLocation(self.renderingProgramID, "lights[" + str(i) + "].diffuse"))
-        #     self.lightsSpecularLocs.append(glGetUniformLocation(self.renderingProgramID, "lights[" + str(i) + "].specular"))
+        for i in range(NUMBER_OF_LIGHTS):
+            self.lightsPosLocs.append(glGetUniformLocation(self.renderingProgramID, "lights[" + str(i) + "].position"))
+            self.lightsDiffuseLocs.append(glGetUniformLocation(self.renderingProgramID, "lights[" + str(i) + "].diffuse"))
+            self.lightsSpecularLocs.append(glGetUniformLocation(self.renderingProgramID, "lights[" + str(i) + "].specular"))
 
 
         self.materialDiffuseLoc                = glGetUniformLocation(self.renderingProgramID, "u_mat_diffuse")
