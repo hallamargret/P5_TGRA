@@ -6,7 +6,7 @@ import sys
 
 from Base3DObjects import *
 
-NUMBER_OF_LIGHTS = 4
+NUMBER_OF_LIGHTS = 1
 
 class Shader3D:
     def __init__(self):
@@ -36,7 +36,6 @@ class Shader3D:
         self.positionLoc			= glGetAttribLocation(self.renderingProgramID, "a_position")
         glEnableVertexAttribArray(self.positionLoc)
 
-        ## ADD CODE HERE ##
 
         self.normalLoc			= glGetAttribLocation(self.renderingProgramID, "a_normal")
         glEnableVertexAttribArray(self.normalLoc)
@@ -50,20 +49,23 @@ class Shader3D:
 
         self.eyePosLoc                = glGetUniformLocation(self.renderingProgramID, "u_eye_position")
 
-        # self.lightPosLoc            = glGetUniformLocation(self.renderingProgramID, "u_light_position")
+        self.lightPosLoc            = glGetUniformLocation(self.renderingProgramID, "u_light_position")
+        self.light2PosLoc            = glGetUniformLocation(self.renderingProgramID, "u_light_position2")
 
-        # self.lightDiffuseLoc = glGetUniformLocation(self.renderingProgramID,  "u_light_diffuse")
-        # self.lightSpecularLoc = glGetUniformLocation(self.renderingProgramID,  "u_light_specular")
+        self.lightDiffuseLoc = glGetUniformLocation(self.renderingProgramID,  "u_light_diffuse")
+        self.light2DiffuseLoc = glGetUniformLocation(self.renderingProgramID,  "u_light_diffuse2")
+        self.lightSpecularLoc = glGetUniformLocation(self.renderingProgramID,  "u_light_specular")
+        self.lightS2pecularLoc = glGetUniformLocation(self.renderingProgramID,  "u_light_specular2")
 
-        self.lightsPosLocs = []     #list of the locations of the positions of all the lights
-        self.lightsDiffuseLocs = []     #list of the locations of the diffuse of all the lights
-        self.lightsSpecularLocs = []    #list of the locations of the specular of all the lights
+        # self.lightsPosLocs = []     #list of the locations of the positions of all the lights
+        # self.lightsDiffuseLocs = []     #list of the locations of the diffuse of all the lights
+        # self.lightsSpecularLocs = []    #list of the locations of the specular of all the lights
         
 
-        for i in range(NUMBER_OF_LIGHTS):
-            self.lightsPosLocs.append(glGetUniformLocation(self.renderingProgramID, "lights[" + str(i) + "].position"))
-            self.lightsDiffuseLocs.append(glGetUniformLocation(self.renderingProgramID, "lights[" + str(i) + "].diffuse"))
-            self.lightsSpecularLocs.append(glGetUniformLocation(self.renderingProgramID, "lights[" + str(i) + "].specular"))
+        # for i in range(NUMBER_OF_LIGHTS):
+        #     self.lightsPosLocs.append(glGetUniformLocation(self.renderingProgramID, "lights[" + str(i) + "].position"))
+        #     self.lightsDiffuseLocs.append(glGetUniformLocation(self.renderingProgramID, "lights[" + str(i) + "].diffuse"))
+        #     self.lightsSpecularLocs.append(glGetUniformLocation(self.renderingProgramID, "lights[" + str(i) + "].specular"))
 
 
         self.materialDiffuseLoc                = glGetUniformLocation(self.renderingProgramID, "u_mat_diffuse")
@@ -95,6 +97,9 @@ class Shader3D:
 
     def set_light_position(self, pos):
         glUniform4f(self.lightPosLoc, pos.x, pos.y, pos.z, 1.0)
+
+    def set_light2_position(self, pos):
+        glUniform4f(self.light2PosLoc, pos.x, pos.y, pos.z, 1.0)
     
     '''Doing all three in one function, setting the lights position, diffuse, specular and wheter it is a directional or positional light'''
     def set_light_pos_diff_spec(self, light_index, pos, diff, spec, dir_or_pos_light):
@@ -108,8 +113,14 @@ class Shader3D:
     def set_light_diffuse(self, red, green , blue):
         glUniform4f(self.lightDiffuseLoc, red, green, blue, 1.0)
 
+    def set_light2_diffuse(self, red, green , blue):
+        glUniform4f(self.light2DiffuseLoc, red, green, blue, 1.0)
+
     def set_light_specular(self, red, green , blue):
         glUniform4f(self.lightSpecularLoc, red, green, blue, 1.0)
+
+    def set_light2_specular(self, red, green , blue):
+        glUniform4f(self.light2SpecularLoc, red, green, blue, 1.0)
 
     def set_material_diffuse(self, red, green , blue):
         glUniform4f(self.materialDiffuseLoc, red, green, blue, 1.0)

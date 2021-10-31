@@ -100,10 +100,10 @@ class GraphicsProgram3D:
 
         self.has_won = False
 
-        self.texture_id01 = self.load_texture(sys.path[0] + "/crowd.png")
-        self.texture_id02 = self.load_texture_rotate(sys.path[0] +"/crowd.png")
-        # self.texture_id01 = self.load_texture("dice.png")
-        # surface = pygame.image.load("fence_tex.png")
+        self.texture_id01 = self.load_texture(sys.path[0] + "/images/crowd.png")
+        self.texture_id02 = self.load_texture_rotate(sys.path[0] +"/images/crowd.png")
+        # self.texture_id01 = self.load_texture("/images/dice.png")
+        # surface = pygame.image.load("/images/fence_tex.png")
         # tex_string = pygame.image.tostring(surface, "RGBA", 1)
         # width = surface.get_width()
         # height = surface.get_height()
@@ -290,19 +290,28 @@ class GraphicsProgram3D:
         self.shader.set_eye_position(view_matrix.eye)
 
         # first light  (positional)
-        self.shader.set_light_pos_diff_spec(0, Point(25, 15, 0), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1.0)
-        # self.shader.set_light_position(Point(25, 25, 25))
-        # self.shader.set_light_diffuse(0.5, 0.5, 0.5)
-        # self.shader.set_light_specular(0.4, 0.4, 0.4)
+        #self.shader.set_light_pos_diff_spec(0, Point(25, 15, 0), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1.0)
+        self.shader.set_light_position(Point(25, 50, 25))
+        self.shader.set_light_diffuse(1.0, 1.0, 1.0)
+        self.shader.set_light_specular(0.4, 0.4, 0.4)
         
         # second light (positional)
-        self.shader.set_light_pos_diff_spec(1, Point(25, 15, 50), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1.0)
-        
+        #self.shader.set_light_pos_diff_spec(1, Point(25, 15, 50), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1.0)
+        # self.shader.set_light_position(Point(0, 5, 0))
+        # self.shader.set_light_diffuse(1.0, 1.0, 1.0)
+        # self.shader.set_light_specular(0.4, 0.4, 0.4)
+
         # third light (positional)
-        self.shader.set_light_pos_diff_spec(2, Point(0, 15, 25), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1.0)
+        #self.shader.set_light_pos_diff_spec(2, Point(0, 15, 25), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1.0)
+        # self.shader.set_light_position(Point(0, 5, 0))
+        # self.shader.set_light_diffuse(1.0, 1.0, 1.0)
+        # self.shader.set_light_specular(0.4, 0.4, 0.4)
         
         # fourth light (positional)
-        self.shader.set_light_pos_diff_spec(3, Point(50, 15, 25), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1.0)
+        #self.shader.set_light_pos_diff_spec(3, Point(50, 15, 25), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1.0)
+        # self.shader.set_light_position(Point(0, 5, 0))
+        # self.shader.set_light_diffuse(1.0, 1.0, 1.0)
+        # self.shader.set_light_specular(0.4, 0.4, 0.4)
 
         # fifth light, flashlight (directional). Turned on when space has been pressed, turns off when space is pressed again.
         # if self.flashlight:

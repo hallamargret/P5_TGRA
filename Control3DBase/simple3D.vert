@@ -8,26 +8,29 @@ uniform mat4 u_projection_matrix;
 
 uniform vec4 u_eye_position;
 
-// uniform vec4 u_light_position;
+uniform vec4 u_light_position;
 
 
 // varying vec4 v_color;
-varying vec4 v_normal[4];
-varying vec4 v_s[4];
-varying vec4 v_h[4];
+// varying vec4 v_normal[4];
+// varying vec4 v_s[4];
+// varying vec4 v_h[4];
+varying vec4 v_normal;
+varying vec4 v_s;
+varying vec4 v_h;
 varying vec2 v_uv;
 
-struct light{
-	vec4 position;
-	vec4 diffuse;
-	vec4 specular;
+// struct light{
+// 	vec4 position;
+// 	vec4 diffuse;
+// 	vec4 specular;
 
-};
+// };
 
-uniform light lights[4];
+//uniform light lights[4];
 
-varying vec4 v_light_diffuse[4];
-varying vec4 v_light_specular[4];
+// varying vec4 v_light_diffuse[4];
+// varying vec4 v_light_specular[4];
 
 
 
@@ -46,15 +49,19 @@ void main(void)
 
 	// local coordinates
 	position = u_model_matrix * position;
+	v_normal = normalize(u_model_matrix * normal);
+	v_s = normalize(u_light_position - position);
+	vec4 v = normalize(u_eye_position - position);
+	v_h = normalize(v_s + v);
 
-	for (int i = 0; i < 4; i++){
-		v_normal[i] = normalize(u_model_matrix * normal);
-		v_s[i] = normalize(lights[i].position - position);
-		vec4 v = normalize(u_eye_position - position);
-		v_h[i] = normalize(v_s[i] + v);
-		v_light_diffuse[i] = lights[i].diffuse;
-		v_light_specular[i] = lights[i].specular;
-	}
+	// for (int i = 0; i < 1; i++){
+	// 	v_normal[i] = normalize(u_model_matrix * normal);
+	// 	v_s[i] = normalize(lights[i].position - position);
+	// 	vec4 v = normalize(u_eye_position - position);
+	// 	v_h[i] = normalize(v_s[i] + v);
+	// 	v_light_diffuse[i] = lights[i].diffuse;
+	// 	v_light_specular[i] = lights[i].specular;
+	// }
 
 
 	// vec4 total;
