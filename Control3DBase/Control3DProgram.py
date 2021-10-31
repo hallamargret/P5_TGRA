@@ -100,8 +100,8 @@ class GraphicsProgram3D:
 
         self.has_won = False
 
-        self.texture_id01 = self.load_texture("crowd.png")
-        self.texture_id02 = self.load_texture_rotate("crowd.png")
+        self.texture_id01 = self.load_texture(sys.path[0] + "/crowd.png")
+        self.texture_id02 = self.load_texture_rotate(sys.path[0] +"/crowd.png")
         # self.texture_id01 = self.load_texture("dice.png")
         # surface = pygame.image.load("fence_tex.png")
         # tex_string = pygame.image.tostring(surface, "RGBA", 1)
