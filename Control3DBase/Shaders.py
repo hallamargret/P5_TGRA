@@ -6,7 +6,7 @@ import sys
 
 from Base3DObjects import *
 
-NUMBER_OF_LIGHTS = 2
+NUMBER_OF_LIGHTS = 5
 
 class Shader3D:
     def __init__(self):

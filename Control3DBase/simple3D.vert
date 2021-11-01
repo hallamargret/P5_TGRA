@@ -13,8 +13,8 @@ uniform vec4 u_eye_position;
 
 // varying vec4 v_color;
 varying vec4 v_normal;
-varying vec4 v_s[2];
-varying vec4 v_h[2];
+varying vec4 v_s[5];
+varying vec4 v_h[5];
 varying vec2 v_uv;
 
 struct light{
@@ -24,7 +24,7 @@ struct light{
 
 };
 
-uniform light lights[2];
+uniform light lights[5];
 
 
 
@@ -43,8 +43,13 @@ void main(void)
 
 	v_normal = normalize(u_model_matrix * normal);
 
-	for (int i = 0; i < 2; i++){
-		v_s[i] = normalize(lights[i].position - position);
+	for (int i = 0; i < 4; i++){
+		if (lights[i].position.w == 1.0){ // Positional light
+			v_s[i] = normalize(lights[i].position - position);
+		} else {
+			v_s[i] = normalize(lights[i].position);
+		}
+		
 		vec4 v = normalize(u_eye_position - position);
 		v_h[i] = normalize(v_s[i] + v);
 	}

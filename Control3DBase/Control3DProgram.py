@@ -144,10 +144,10 @@ class GraphicsProgram3D:
         self.x_walls.append(Wall(Vector(0, (self.wall_height/2), self.track_size/2), Vector(0.8, self.wall_height, self.track_size)))
         self.x_walls.append(Wall(Vector(self.track_size, (self.wall_height/2), self.track_size/2), Vector(0.8, self.wall_height, self.track_size)))
         # maze walls
-        self.x_walls.append(Wall(Vector(10, (self.wall_height/4), 25), Vector(0.2, self.wall_height/2, 30)))
-        self.x_walls.append(Wall(Vector(40, (self.wall_height/4), 25), Vector(0.2, self.wall_height/2, 30)))
-        self.z_walls.append(Wall(Vector(25, (self.wall_height/4), 40), Vector(30, self.wall_height/2, 0.2)))
-        self.z_walls.append(Wall(Vector(25, (self.wall_height/4), 10), Vector(30, self.wall_height/2, 0.2)))
+        self.x_walls.append(Wall(Vector(10, (self.wall_height/8), 25), Vector(0.2, self.wall_height/2, 30)))
+        self.x_walls.append(Wall(Vector(40, (self.wall_height/8), 25), Vector(0.2, self.wall_height/2, 30)))
+        self.z_walls.append(Wall(Vector(25, (self.wall_height/8), 40), Vector(30, self.wall_height/2, 0.2)))
+        self.z_walls.append(Wall(Vector(25, (self.wall_height/8), 10), Vector(30, self.wall_height/2, 0.2)))
 
     def draw_maze_floor(self, color_list, translation_list, scale_list):
         #self.shader.set_material_diffuse(color_list[0], color_list[1], color_list[2])
@@ -290,19 +290,28 @@ class GraphicsProgram3D:
         self.shader.set_eye_position(view_matrix.eye)
 
         # first light  (positional)
-        self.shader.set_light_pos_diff_spec(0, Point(25, 15, 0), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1)
+        #self.shader.set_light_pos_diff_spec(0, Point(25, 40, 25), (0.8, 0.8, 0.8), (0.2, 0.2, 0.2), 1.0)
         # self.shader.set_light_position(Point(25, 25, 25))
-        # self.shader.set_light_diffuse(0.5, 0.5, 0.5)
+        # self.shader.set_light_diffuse(0.8, 0.8, 0.8)
         # self.shader.set_light_specular(0.4, 0.4, 0.4)
         
-        # second light (positional)
-        self.shader.set_light_pos_diff_spec(1, Point(25, 15, 50), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1)
+        # # second light (positional)
+        self.shader.set_light_pos_diff_spec(1, Vector(0.5, 0, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
+
+        self.shader.set_light_pos_diff_spec(2, Vector(-0.5, 0, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
+
+        self.shader.set_light_pos_diff_spec(3, Vector(0, 0, 0.5), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
+
+        self.shader.set_light_pos_diff_spec(0, Vector(0, 0, -0.5), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
         
-        # third light (positional)
-        # self.shader.set_light_pos_diff_spec(2, Point(0, 15, 25), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1)
+        # # third light (positional)
+        # self.shader.set_light_pos_diff_spec(2, Point(5, 40, 25), (0.8, 0.8, 0.8), (0.2, 0.2, 0.2), 1.0)
         
         # # fourth light (positional)
-        # self.shader.set_light_pos_diff_spec(3, Point(50, 15, 25), (1.0, 1.0, 1.0), (0.3, 0.3, 0.3), 1)
+        # self.shader.set_light_pos_diff_spec(3, Point(45, 40, 25), (0.8, 0.8, 0.8), (0.2, 0.2, 0.2), 1.0)
+
+        # # fifth light
+        # self.shader.set_light_pos_diff_spec(4, Point(25, 40, 5), (0.8, 0.8, 0.8), (0.2, 0.2, 0.2), 1.0)
 
         # fifth light, flashlight (directional). Turned on when space has been pressed, turns off when space is pressed again.
         # if self.flashlight:
@@ -347,7 +356,6 @@ class GraphicsProgram3D:
         for wall in self.z_walls:
             wall.draw(self.shader, self.model_matrix, self.cube)
 
-        glActiveTexture(GL_TEXTURE2)
 
         self.end_cubes[self.current_end_cube].draw()
 
