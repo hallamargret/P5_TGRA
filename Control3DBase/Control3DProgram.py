@@ -295,14 +295,17 @@ class GraphicsProgram3D:
         # self.shader.set_light_diffuse(0.8, 0.8, 0.8)
         # self.shader.set_light_specular(0.4, 0.4, 0.4)
         
-        # # second light (positional)
-        self.shader.set_light_pos_diff_spec(1, Vector(0.5, 0, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
+        # # second light (direcionsl)
+        self.shader.set_light_pos_diff_spec(1, Vector(1, 0, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
 
-        self.shader.set_light_pos_diff_spec(2, Vector(-0.5, 0, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
+        self.shader.set_light_pos_diff_spec(2, Vector(0, 0, 1), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
 
-        self.shader.set_light_pos_diff_spec(3, Vector(0, 0, 0.5), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
+        self.shader.set_light_pos_diff_spec(0, Vector(0, 0, -1), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
 
-        self.shader.set_light_pos_diff_spec(0, Vector(0, 0, -0.5), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
+        self.shader.set_light_pos_diff_spec(3, Vector(-1, 0, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
+
+        
+        self.shader.set_light_pos_diff_spec(4, Vector(0, 1, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
         
         # # third light (positional)
         # self.shader.set_light_pos_diff_spec(2, Point(5, 40, 25), (0.8, 0.8, 0.8), (0.2, 0.2, 0.2), 1.0)
@@ -323,10 +326,16 @@ class GraphicsProgram3D:
         #self.shader.set_light_pos_diff_spec(4, Point(1, 1, 1), (0.6, 0.6, 0.6), (0.5, 0.5, 0.5), 0.0)
 
         self.shader.set_material_specular(0.75, 0.75, 0.75)
-        self.shader.set_material_shininess(15)
+        self.shader.set_material_shininess(30)
 
         self.model_matrix.load_identity()
 
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id01)
+        self.shader.set_diffuse_tex(0)
+        glActiveTexture(GL_TEXTURE1)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id01)
+        self.shader.set_spec_tex(1)
 
         # The maze floor
         color = [0.5, 0.5, 0.7]

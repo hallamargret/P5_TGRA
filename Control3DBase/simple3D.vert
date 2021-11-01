@@ -8,6 +8,8 @@ uniform mat4 u_projection_matrix;
 
 uniform vec4 u_eye_position;
 
+// const int NUMBER_OF_LIGHTS = 5;
+
 // uniform vec4 u_light_position;
 
 
@@ -43,7 +45,8 @@ void main(void)
 
 	v_normal = normalize(u_model_matrix * normal);
 
-	for (int i = 0; i < 4; i++){
+	for (int i = 0; i < 5; i++){
+	//for (int i = 1; i >= 0; i--){
 		if (lights[i].position.w == 1.0){ // Positional light
 			v_s[i] = normalize(lights[i].position - position);
 		} else {
