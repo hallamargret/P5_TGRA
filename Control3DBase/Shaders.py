@@ -74,6 +74,8 @@ class Shader3D:
         
         self.specularTextureLoc                 = glGetUniformLocation(self.renderingProgramID, "u_tex02")
 
+        self.usingTextureLoc                    = glGetUniformLocation(self.renderingProgramID, "u_using_texture")
+
     def use(self):
         try:
             glUseProgram(self.renderingProgramID)   
@@ -135,6 +137,9 @@ class Shader3D:
     
     def set_spec_tex(self, number):
         glUniform1i(self.diffuseTextureLoc, number)
+    
+    def set_using_texture(self, number):
+        glUniform1f(self.usingTextureLoc, number)
 
     
 

@@ -2,10 +2,10 @@ from Base3DObjects import Vector
 
 class Wall:
 
-    def __init__(self, translation: Vector, scale: Vector):
+    def __init__(self, translation: Vector, scale: Vector, color=(1.0, 1.0, 1.0)):
         self.translation = translation
         self.scale = scale
-        self.color = (1.0, 1.0, 1.0)
+        self.color = color
 
         self.min_x = self.translation.x - (self.scale.x)/2
         self.max_x = self.translation.x + (self.scale.x)/2

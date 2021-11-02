@@ -39,11 +39,14 @@ class GraphicsProgram3D:
         self.wall_height = 6
         self.track_size = 50
 
+        self.car_height = 2.0
+
         self.near_plane = 0.3
         self.far_plane = 100
         self.x_walls = []
         self.z_walls = []
-        self.radius = 0.8
+        self.inner_walls = []
+        self.radius = 1.5
         
         
         self.projection_matrix = ProjectionMatrix()
@@ -75,8 +78,8 @@ class GraphicsProgram3D:
         self.flashlight = False
         self.map = True     #little viewport to see a map in the upper right corner, to turn on and off press p
     
-        self.car_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(self.view_matrix_player1.eye.x, self.view_matrix_player1.eye.y, self.view_matrix_player1.eye.z), Vector(0,0,0), Vector(5.0, 2.0, 2.0), (1,0,0))
-        self.car_2 = GameObject(self.cube, self.shader, self.model_matrix, Vector(self.view_matrix_player2.eye.x, self.view_matrix_player2.eye.y, self.view_matrix_player2.eye.z), Vector(0,0,0), Vector(5.0, 2.0, 2.0), (0,0,1))
+        self.car_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(self.view_matrix_player1.eye.x, self.car_height/2, self.view_matrix_player1.eye.z), Vector(0,0,0), Vector(3.0, self.car_height, 1.5), (1,0,0))
+        self.car_2 = GameObject(self.cube, self.shader, self.model_matrix, Vector(self.view_matrix_player2.eye.x, self.car_height/2, self.view_matrix_player2.eye.z), Vector(0,0,0), Vector(3.0, self.car_height, 1.5), (0,0,1))
 
         # Cubes that are moving in the maze, the player will collide on them, set as hindrance
         moving_cube_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(14.0, 1.0, 2.0), Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), (1.0, 0.0, 0.0))
@@ -138,20 +141,38 @@ class GraphicsProgram3D:
         return tex_id
 
     def add_walls(self):
-        #big walls
-        self.z_walls.append(Wall(Vector(self.track_size/2, (self.wall_height/2), self.track_size), Vector(self.track_size, self.wall_height, 0.8)))
-        self.z_walls.append(Wall(Vector(self.track_size/2, (self.wall_height/2), 0), Vector(self.track_size, self.wall_height, 0.8)))
-        self.x_walls.append(Wall(Vector(0, (self.wall_height/2), self.track_size/2), Vector(0.8, self.wall_height, self.track_size)))
-        self.x_walls.append(Wall(Vector(self.track_size, (self.wall_height/2), self.track_size/2), Vector(0.8, self.wall_height, self.track_size)))
+        # #big walls
+        # self.z_walls.append(Wall(Vector(self.track_size/2, (self.wall_height/2), self.track_size), Vector(self.track_size, self.wall_height, 0.8)))
+        # self.z_walls.append(Wall(Vector(self.track_size/2, (self.wall_height/2), 0), Vector(self.track_size, self.wall_height, 0.8)))
+        # self.x_walls.append(Wall(Vector(0, (self.wall_height/2), self.track_size/2), Vector(0.8, self.wall_height, self.track_size)))
+        # self.x_walls.append(Wall(Vector(self.track_size, (self.wall_height/2), self.track_size/2), Vector(0.8, self.wall_height, self.track_size)))
+
+        self.z_walls.append(Wall(Vector((self.track_size - self.track_size/4), (self.wall_height/2), self.track_size), Vector(self.track_size/2, self.wall_height, 0.8)))
+        self.z_walls.append(Wall(Vector((self.track_size - self.track_size/4), (self.wall_height/2), 0), Vector(self.track_size/2, self.wall_height, 0.8)))
+        self.x_walls.append(Wall(Vector(0, (self.wall_height/2), (self.track_size - self.track_size/4)), Vector(0.8, self.wall_height, self.track_size/2)))
+        self.x_walls.append(Wall(Vector(self.track_size, (self.wall_height/2), (self.track_size - self.track_size/4)), Vector(0.8, self.wall_height, self.track_size/2)))
+
+        self.z_walls.append(Wall(Vector(self.track_size/4, (self.wall_height/2), self.track_size), Vector(self.track_size/2, self.wall_height, 0.8)))
+        self.z_walls.append(Wall(Vector(self.track_size/4, (self.wall_height/2), 0), Vector(self.track_size/2, self.wall_height, 0.8)))
+        self.x_walls.append(Wall(Vector(0, (self.wall_height/2), self.track_size/4), Vector(0.8, self.wall_height, self.track_size/2)))
+        self.x_walls.append(Wall(Vector(self.track_size, (self.wall_height/2), self.track_size/4), Vector(0.8, self.wall_height, self.track_size/2)))
+
+        
+        
         # maze walls
-        self.x_walls.append(Wall(Vector(10, (self.wall_height/8), 25), Vector(0.2, self.wall_height/2, 30)))
-        self.x_walls.append(Wall(Vector(40, (self.wall_height/8), 25), Vector(0.2, self.wall_height/2, 30)))
-        self.z_walls.append(Wall(Vector(25, (self.wall_height/8), 40), Vector(30, self.wall_height/2, 0.2)))
-        self.z_walls.append(Wall(Vector(25, (self.wall_height/8), 10), Vector(30, self.wall_height/2, 0.2)))
+        # self.x_walls.append(Wall(Vector(10, (self.wall_height/8), 25), Vector(0.2, self.wall_height/2, 30), (0.753, 0.753, 0.753)))
+        # self.x_walls.append(Wall(Vector(40, (self.wall_height/8), 25), Vector(0.2, self.wall_height/2, 30), (0.753, 0.753, 0.753)))
+        # self.z_walls.append(Wall(Vector(25, (self.wall_height/8), 40), Vector(30, self.wall_height/2, 0.2), (0.753, 0.753, 0.753)))
+        # self.z_walls.append(Wall(Vector(25, (self.wall_height/8), 10), Vector(30, self.wall_height/2, 0.2), (0.753, 0.753, 0.753)))
+
+        self.inner_walls.append(Wall(Vector(10, (self.wall_height/8), 25), Vector(0.2, self.wall_height/2, 30), (0.753, 0.753, 0.753)))
+        self.inner_walls.append(Wall(Vector(40, (self.wall_height/8), 25), Vector(0.2, self.wall_height/2, 30), (0.753, 0.753, 0.753)))
+        self.inner_walls.append(Wall(Vector(25, (self.wall_height/8), 40), Vector(30, self.wall_height/2, 0.2), (0.753, 0.753, 0.753)))
+        self.inner_walls.append(Wall(Vector(25, (self.wall_height/8), 10), Vector(30, self.wall_height/2, 0.2), (0.753, 0.753, 0.753)))
+
 
     def draw_maze_floor(self, color_list, translation_list, scale_list):
-        #self.shader.set_material_diffuse(color_list[0], color_list[1], color_list[2])
-        
+        self.shader.set_material_diffuse(color_list[0], color_list[1], color_list[2])
         self.model_matrix.push_matrix()
         self.model_matrix.add_translation(translation_list[0], translation_list[1], translation_list[2])
         self.model_matrix.add_scale(scale_list[0], scale_list[1], scale_list[2])
@@ -273,13 +294,17 @@ class GraphicsProgram3D:
         for wall in self.z_walls:
             self.check_collision(wall, self.view_matrix_player1)
             self.check_collision(wall, self.view_matrix_player2)
+        
+        for wall in self.inner_walls:
+            self.check_collision(wall, self.view_matrix_player1)
+            self.check_collision(wall, self.view_matrix_player2)
 
         self.check_moving_cube_collision()
         self.check_spinning_cube_collision(self.view_matrix_player1)
         self.check_spinning_cube_collision(self.view_matrix_player2)
 
-        self.car_1.translation = Vector(self.view_matrix_player1.eye.x, self.view_matrix_player1.eye.y, self.view_matrix_player1.eye.z)
-        self.car_2.translation = Vector(self.view_matrix_player2.eye.x, self.view_matrix_player2.eye.y, self.view_matrix_player2.eye.z)
+        self.car_1.translation = Vector(self.view_matrix_player1.eye.x, self.car_height/2, self.view_matrix_player1.eye.z)
+        self.car_2.translation = Vector(self.view_matrix_player2.eye.x, self.car_height/2, self.view_matrix_player2.eye.z)
 
         self.check_collision(self.car_1, self.view_matrix_player2)
         self.check_collision(self.car_2, self.view_matrix_player1)
@@ -330,15 +355,8 @@ class GraphicsProgram3D:
 
         self.model_matrix.load_identity()
 
-        glActiveTexture(GL_TEXTURE0)
-        glBindTexture(GL_TEXTURE_2D, self.texture_id01)
-        self.shader.set_diffuse_tex(0)
-        glActiveTexture(GL_TEXTURE1)
-        glBindTexture(GL_TEXTURE_2D, self.texture_id01)
-        self.shader.set_spec_tex(1)
-
         # The maze floor
-        color = [0.5, 0.5, 0.7]
+        color = [0.39, 0.40, 0.42]
         translation_list = [self.track_size/2, 0, self.track_size/2]
         scale_list = [self.track_size, 0.8, self.track_size]
         self.draw_maze_floor(color, translation_list, scale_list)
@@ -351,6 +369,7 @@ class GraphicsProgram3D:
         glActiveTexture(GL_TEXTURE1)
         glBindTexture(GL_TEXTURE_2D, self.texture_id02)
         self.shader.set_spec_tex(1)
+        self.shader.set_using_texture(1.0)
 
         for wall in self.x_walls:
             wall.draw(self.shader, self.model_matrix, self.cube)
@@ -363,6 +382,11 @@ class GraphicsProgram3D:
         self.shader.set_spec_tex(1)
 
         for wall in self.z_walls:
+            wall.draw(self.shader, self.model_matrix, self.cube)
+        
+        self.shader.set_using_texture(0.0)
+
+        for wall in self.inner_walls:
             wall.draw(self.shader, self.model_matrix, self.cube)
 
 
