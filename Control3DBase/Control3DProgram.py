@@ -15,6 +15,8 @@ from behaviours.spin import Spin
 from behaviours.move import MoveOnX
 from behaviours.move import MoveOnZ
 
+import ojb_3D_loading
+
 class GraphicsProgram3D:
     def __init__(self):
 
@@ -56,6 +58,7 @@ class GraphicsProgram3D:
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
 
         self.cube = Cube()
+        self.obj_model = ojb_3D_loading.load_obj_file(sys.path[0] + "/models", "combined_model.obj")
 
         self.clock = pygame.time.Clock()
         self.clock.tick()
@@ -83,10 +86,11 @@ class GraphicsProgram3D:
         self.car_2 = GameObject(Vector(self.view_matrix_player2.eye.x, self.car_height/2, self.view_matrix_player2.eye.z), Vector(0,0,0), Vector(1.5, self.car_height, 3.0), (0,0,1))
 
         # Cubes that are moving in the maze, the player will collide on them, set as hindrance
-        moving_cube_1 = GameObject(Vector(14.0, 1.0, 2.0), Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), (1.0, 0.0, 0.0))
+        moving_cube_1 = GameObject(Vector(25.0, 10.0, 2.0), Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), (1.0, 0.0, 0.0))
+        moving_cube_2 = GameObject(Vector(25.0, 10.0, 40.0), Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), (1.0, 0.0, 0.0))
     
 
-        self.moving_cubes = [moving_cube_1]
+        self.moving_cubes = [moving_cube_1, moving_cube_2]
 
         # Player should try to collect all of the end cubes, when all are collected the player will win the game
         end_cube_1 = GameObject(Vector(18.0, 1.0, 18.0), Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), (1.0, 0.0, 1.0))
@@ -297,7 +301,7 @@ class GraphicsProgram3D:
     def display_player(self, view_matrix, player):
         self.shader.set_view_matrix(view_matrix.get_matrix())
         self.shader.set_eye_position(view_matrix.eye)
-        print(f"Player {player}, is at eye position {view_matrix.eye}")
+        #print(f"Player {player}, is at eye position {view_matrix.eye}")
 
         # first light  (positional)
         #self.shader.set_light_pos_diff_spec(0, Point(25, 40, 25), (0.8, 0.8, 0.8), (0.2, 0.2, 0.2), 1.0)
@@ -335,7 +339,7 @@ class GraphicsProgram3D:
         # fifth light directional fixed position not used but can be replaced for the flashlight (or added to the list but then need some modifycations in the simple3D.vert file)
         #self.shader.set_light_pos_diff_spec(4, Point(1, 1, 1), (0.6, 0.6, 0.6), (0.5, 0.5, 0.5), 0.0)
 
-        self.shader.set_material_specular(0.75, 0.75, 0.75)
+        self.shader.set_material_specular(Color(0.75, 0.75, 0.75))
         self.shader.set_material_shininess(30)
         self.model_matrix.load_identity()
 
@@ -392,6 +396,8 @@ class GraphicsProgram3D:
         for wall in self.x_walls:
             wall.draw(self.shader, self.model_matrix, self.cube)
 
+        #self.obj_model.draw(self.shader)
+
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, self.texture_id01)
         self.shader.set_diffuse_tex(0)
@@ -408,18 +414,20 @@ class GraphicsProgram3D:
             wall.draw(self.shader, self.model_matrix, self.cube)
 
 
-        self.end_cubes[self.current_end_cube].draw(self.cube, self.shader, self.model_matrix)
 
+        self.end_cubes[self.current_end_cube].draw(self.cube, self.shader, self.model_matrix)
         
 
         for cube in self.moving_cubes:
             cube.draw(self.cube, self.shader, self.model_matrix)
+            self.obj_model.draw(self.shader)
 
-        
         if player == 1:
             self.car_2.draw(self.cube, self.shader, self.model_matrix)
         else:
             self.car_1.draw(self.cube, self.shader, self.model_matrix)
+        
+        
         
         
 
@@ -454,7 +462,7 @@ class GraphicsProgram3D:
         glClearColor(0.0, 0.2, 0.8, 1.0)    #color of space (sky)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-        self.shader.set_material_diffuse(1.0, 1.0, 1.0)
+        self.shader.set_material_diffuse(Color(1.0, 1.0, 1.0))
 
         glViewport(0, 300, 800, 300)
 

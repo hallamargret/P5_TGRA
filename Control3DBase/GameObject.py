@@ -6,7 +6,7 @@ class GameObject:
         self.translation = translation
         self.rotation = rotation
         self.scale = scale
-        self.color = color
+        self.color = Color(color[0], color[1], color[2])
         self.behaviors = []
 
         self.min_x = self.translation.x - (self.scale.x)/2
@@ -22,7 +22,7 @@ class GameObject:
         model_matrix.add_rotate_z(self.rotation.z)
         model_matrix.add_scale(self.scale.x, self.scale.y, self.scale.z)
         shader.set_model_matrix(model_matrix.matrix)
-        shader.set_material_diffuse(*self.color)
+        shader.set_material_diffuse(self.color)
         drawable.set_verticies(shader)
         drawable.draw()
         model_matrix.pop_matrix()
@@ -37,3 +37,10 @@ class GameObject:
     
     def add_behavior(self, behavior_instance):
         self.behaviors.append(behavior_instance)
+
+class Color:
+    def __init__(self, r, g, b):
+        self.r = r
+        self.g = g
+        self.b = b
+
