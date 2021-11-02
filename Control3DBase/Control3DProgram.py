@@ -21,7 +21,7 @@ class GraphicsProgram3D:
     def __init__(self):
 
         pygame.init() 
-        pygame.display.set_mode((800,600), pygame.OPENGL|pygame.DOUBLEBUF)
+        pygame.display.set_mode((1000,750), pygame.OPENGL|pygame.DOUBLEBUF)
 
         self.shader = Shader3D()
         self.shader.use()
@@ -54,11 +54,11 @@ class GraphicsProgram3D:
         
         self.projection_matrix = ProjectionMatrix()
         self.fov = pi/2
-        self.projection_matrix.set_perspective((pi / 2), (800 / 600), self.near_plane, self.far_plane)
+        self.projection_matrix.set_perspective((self.fov), (1000 / 750), self.near_plane, self.far_plane)
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
 
         self.cube = Cube()
-        self.obj_model = ojb_3D_loading.load_obj_file(sys.path[0] + "/models", "combined_model.obj")
+        self.obj_model = ojb_3D_loading.load_obj_file(sys.path[0] + "/models", "smooth_sphere.obj")
 
         self.clock = pygame.time.Clock()
         self.clock.tick()
@@ -287,7 +287,7 @@ class GraphicsProgram3D:
             self.check_collision(wall, self.view_matrix_player1)
             self.check_collision(wall, self.view_matrix_player2)
 
-        self.check_moving_cube_collision()
+        #self.check_moving_cube_collision()
         #self.check_spinning_cube_collision(self.view_matrix_player1)
         #self.check_spinning_cube_collision(self.view_matrix_player2)
 
@@ -434,7 +434,7 @@ class GraphicsProgram3D:
 
         #little map of the maze in another smaller viewport, displays in the upper right corner. Turn off and on with the letter p on keyboard
         # if self.map:
-        #     glViewport(600, 400, 250, 200)
+        #     glViewport(750, 400, 250, 200)
         #     glClear(GL_DEPTH_BUFFER_BIT)
         #     self.shader.set_view_matrix(self.overview_matrix.get_matrix())
         #     self.shader.set_eye_position(self.overview_matrix.eye)
@@ -464,7 +464,7 @@ class GraphicsProgram3D:
 
         self.shader.set_material_diffuse(Color(1.0, 1.0, 1.0))
 
-        glViewport(0, 300, 800, 300)
+        glViewport(0, 375, 1000, 375)
 
         # glActiveTexture(GL_TEXTURE0)
         # glBindTexture(GL_TEXTURE_2D, self.texture_id01)
@@ -474,7 +474,7 @@ class GraphicsProgram3D:
         # self.shader.set_spec_tex(1)
 
 
-        self.projection_matrix.set_perspective((self.fov), (800 / 600), self.near_plane, self.far_plane)
+        self.projection_matrix.set_perspective((self.fov), (1000 / 750), self.near_plane, self.far_plane)
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
 
         self.display_player(self.view_matrix_player1, 1)
@@ -490,7 +490,7 @@ class GraphicsProgram3D:
         #     self.shader.set_eye_position(self.view_matrix_player1.eye)
 
         
-        glViewport(0, 0, 800, 300)
+        glViewport(0, 0, 1000, 375)
         # glActiveTexture(GL_TEXTURE0)
         # glBindTexture(GL_TEXTURE_2D, self.texture_id02)
         # self.shader.set_diffuse_tex(0)
@@ -498,7 +498,7 @@ class GraphicsProgram3D:
         # glBindTexture(GL_TEXTURE_2D, self.texture_id02)
         # self.shader.set_spec_tex(1)
 
-        self.projection_matrix.set_perspective((self.fov), (800 / 600), self.near_plane, self.far_plane)
+        self.projection_matrix.set_perspective((self.fov), (1000 / 750), self.near_plane, self.far_plane)
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
 
         self.display_player(self.view_matrix_player2, 2)
@@ -517,9 +517,9 @@ class GraphicsProgram3D:
         glClearColor(0.0, 0.0, 0.0, 1.0)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
-        glViewport(0, 0, 800, 600)
+        glViewport(0, 0, 1000, 750)
 
-        self.projection_matrix.set_perspective((self.fov), (800 / 600), self.near_plane, self.far_plane)
+        self.projection_matrix.set_perspective((self.fov), (1000 / 750), self.near_plane, self.far_plane)
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
 
         self.shader.set_view_matrix(self.overview_matrix.get_matrix())
