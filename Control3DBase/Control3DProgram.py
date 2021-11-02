@@ -107,22 +107,19 @@ class GraphicsProgram3D:
         
         self.victory_letters = []
 
-        self.has_won = False
+        self.p1_has_won = False
+        self.p2_has_won = False
+
+        self.p1_lap_counter = 0
+        self.p2_lap_counter = 0
 
         self.texture_id01 = self.load_texture(sys.path[0] + "/images/crowd.png")
-        self.texture_id02 = self.load_texture_rotate(sys.path[0] +"/images/crowd.png")
-        self.texture_id03 = self.load_texture_rotate(sys.path[0] + "/images/finish_line.png")
+        self.texture_id02 = self.load_texture_rotate(sys.path[0] +"/images/crowd.png", -90)
+        self.texture_id03 = self.load_texture_rotate(sys.path[0] + "/images/finish_line.png", -90)
         self.texture_id04 = self.load_texture(sys.path[0] + "/images/White_Arrow.png")
-        self.texture_id05 = self.load_texture_rotate(sys.path[0] + "/images/White_Arrow.png")
-        # self.texture_id01 = self.load_texture("dice.png")
-        # surface = pygame.image.load("fence_tex.png")
-        # tex_string = pygame.image.tostring(surface, "RGBA", 1)
-        # width = surface.get_width()
-        # height = surface.get_height()
-        # tex_id = glGenTextures(1)
-        # glBindTexture(GL_TEXTURE_2D, tex_id)
-        # glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_string)
-        # self.texture_id01 = tex_id
+        self.texture_id05 = self.load_texture_rotate(sys.path[0] + "/images/White_Arrow.png", -90)
+        self.texture_id06 = self.load_texture_rotate(sys.path[0] + "/images/White_Arrow.png", 90)
+
 
     def load_texture(self, path_str):
         surface = pygame.image.load(path_str)
@@ -136,9 +133,9 @@ class GraphicsProgram3D:
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, tex_string)
         return tex_id
     
-    def load_texture_rotate(self, path_str):
+    def load_texture_rotate(self, path_str, degr):
         image = pygame.image.load(path_str)
-        surface = pygame.transform.rotate(image, -90)
+        surface = pygame.transform.rotate(image, degr)
         tex_string = pygame.image.tostring(surface, "RGBA", 1)
         width = surface.get_width()
         height = surface.get_height()
@@ -151,11 +148,6 @@ class GraphicsProgram3D:
 
     def add_walls(self):
         # #big walls
-        # self.z_walls.append(Wall(Vector(self.track_size/2, (self.wall_height/2), self.track_size), Vector(self.track_size, self.wall_height, 0.8)))
-        # self.z_walls.append(Wall(Vector(self.track_size/2, (self.wall_height/2), 0), Vector(self.track_size, self.wall_height, 0.8)))
-        # self.x_walls.append(Wall(Vector(0, (self.wall_height/2), self.track_size/2), Vector(0.8, self.wall_height, self.track_size)))
-        # self.x_walls.append(Wall(Vector(self.track_size, (self.wall_height/2), self.track_size/2), Vector(0.8, self.wall_height, self.track_size)))
-
         self.z_walls.append(Wall(Vector((self.track_size - self.track_size/4), (self.wall_height/2), self.track_size), Vector(self.track_size/2, self.wall_height, 0.8)))
         self.z_walls.append(Wall(Vector((self.track_size - self.track_size/4), (self.wall_height/2), 0), Vector(self.track_size/2, self.wall_height, 0.8)))
         self.x_walls.append(Wall(Vector(0, (self.wall_height/2), (self.track_size - self.track_size/4)), Vector(0.8, self.wall_height, self.track_size/2)))
@@ -166,29 +158,12 @@ class GraphicsProgram3D:
         self.x_walls.append(Wall(Vector(0, (self.wall_height/2), self.track_size/4), Vector(0.8, self.wall_height, self.track_size/2)))
         self.x_walls.append(Wall(Vector(self.track_size, (self.wall_height/2), self.track_size/4), Vector(0.8, self.wall_height, self.track_size/2)))
 
-        
-        
-        # maze walls
-        # self.x_walls.append(Wall(Vector(10, (self.wall_height/8), 25), Vector(0.2, self.wall_height/2, 30), (0.753, 0.753, 0.753)))
-        # self.x_walls.append(Wall(Vector(40, (self.wall_height/8), 25), Vector(0.2, self.wall_height/2, 30), (0.753, 0.753, 0.753)))
-        # self.z_walls.append(Wall(Vector(25, (self.wall_height/8), 40), Vector(30, self.wall_height/2, 0.2), (0.753, 0.753, 0.753)))
-        # self.z_walls.append(Wall(Vector(25, (self.wall_height/8), 10), Vector(30, self.wall_height/2, 0.2), (0.753, 0.753, 0.753)))
-
+        # Inner walls
         self.inner_walls.append(Wall(Vector(10, (self.wall_height/8), 25), Vector(0.2, self.wall_height/2, 30), (0.753, 0.753, 0.753)))
         self.inner_walls.append(Wall(Vector(40, (self.wall_height/8), 25), Vector(0.2, self.wall_height/2, 30), (0.753, 0.753, 0.753)))
         self.inner_walls.append(Wall(Vector(25, (self.wall_height/8), 40), Vector(30, self.wall_height/2, 0.2), (0.753, 0.753, 0.753)))
         self.inner_walls.append(Wall(Vector(25, (self.wall_height/8), 10), Vector(30, self.wall_height/2, 0.2), (0.753, 0.753, 0.753)))
 
-
-    # def draw_maze_floor(self, color_list, translation_list, scale_list):
-    #     self.shader.set_material_diffuse(color_list[0], color_list[1], color_list[2])
-    #     self.model_matrix.push_matrix()
-    #     self.model_matrix.add_translation(translation_list[0], translation_list[1], translation_list[2])
-    #     self.model_matrix.add_scale(scale_list[0], scale_list[1], scale_list[2])
-    #     self.shader.set_model_matrix(self.model_matrix.matrix)
-    #     self.cube.set_verticies(self.shader)
-    #     self.cube.draw()
-    #     self.model_matrix.pop_matrix()
     
     '''Check if the player is colliding any walls or objects, if so it will handle it so the player will slide among the wall/object but not walk througt it'''
     def check_collision(self, wall, view_matrix):
@@ -246,13 +221,13 @@ class GraphicsProgram3D:
 
 
     # TODO taka þetta út?
-    def check_spinning_cube_collision(self, view_matrix):
-        distance_vector = view_matrix.eye - self.end_cubes[self.current_end_cube].translation
-        if distance_vector.__len__() < (self.radius + 0.3):
-            if self.current_end_cube < (len(self.end_cubes) - 1):
-                self.current_end_cube += 1
-            else:
-                self.has_won = True
+    # def check_spinning_cube_collision(self, view_matrix):
+    #     distance_vector = view_matrix.eye - self.end_cubes[self.current_end_cube].translation
+    #     if distance_vector.__len__() < (self.radius + 0.3):
+    #         if self.current_end_cube < (len(self.end_cubes) - 1):
+    #             self.current_end_cube += 1
+    #         else:
+    #             self.has_won = True
 
     
 
@@ -309,8 +284,8 @@ class GraphicsProgram3D:
             self.check_collision(wall, self.view_matrix_player2)
 
         self.check_moving_cube_collision()
-        self.check_spinning_cube_collision(self.view_matrix_player1)
-        self.check_spinning_cube_collision(self.view_matrix_player2)
+        #self.check_spinning_cube_collision(self.view_matrix_player1)
+        #self.check_spinning_cube_collision(self.view_matrix_player2)
 
         self.car_1.translation = Vector(self.view_matrix_player1.eye.x, self.car_height/2, self.view_matrix_player1.eye.z)
         self.car_2.translation = Vector(self.view_matrix_player2.eye.x, self.car_height/2, self.view_matrix_player2.eye.z)
@@ -322,6 +297,7 @@ class GraphicsProgram3D:
     def display_player(self, view_matrix, player):
         self.shader.set_view_matrix(view_matrix.get_matrix())
         self.shader.set_eye_position(view_matrix.eye)
+        print(f"Player {player}, is at eye position {view_matrix.eye}")
 
         # first light  (positional)
         #self.shader.set_light_pos_diff_spec(0, Point(25, 40, 25), (0.8, 0.8, 0.8), (0.2, 0.2, 0.2), 1.0)
@@ -376,6 +352,14 @@ class GraphicsProgram3D:
         self.finish_line_cube.draw(self.cube, self.shader, self.model_matrix)
 
         glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id05)
+        self.shader.set_diffuse_tex(0)
+        glActiveTexture(GL_TEXTURE1)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id05)
+    
+        self.arrow_cube_1.draw(self.cube, self.shader, self.model_matrix)
+
+        glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, self.texture_id04)
         self.shader.set_diffuse_tex(0)
         glActiveTexture(GL_TEXTURE1)
@@ -385,28 +369,14 @@ class GraphicsProgram3D:
         self.arrow_cube_2.draw(self.cube, self.shader, self.model_matrix)
 
         glActiveTexture(GL_TEXTURE0)
-        glBindTexture(GL_TEXTURE_2D, self.texture_id05)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id06)
         self.shader.set_diffuse_tex(0)
         glActiveTexture(GL_TEXTURE1)
-        glBindTexture(GL_TEXTURE_2D, self.texture_id05)
-        
+        glBindTexture(GL_TEXTURE_2D, self.texture_id06)
+        self.shader.set_spec_tex(1)
 
-        self.arrow_cube_1.draw(self.cube, self.shader, self.model_matrix)
         self.arrow_cube_3.draw(self.cube, self.shader, self.model_matrix)
-        
-        
-
-        
-
-        # The maze floor
-        # color = [0.39, 0.40, 0.42]
-        # translation_list = [self.track_size/2, 0, self.track_size/2]
-        # scale_list = [self.track_size, 0.8, self.track_size]
-        # self.draw_maze_floor(color, translation_list, scale_list)
-
-        
-
-        
+    
 
         # Walls of the maze
 
@@ -604,7 +574,7 @@ class GraphicsProgram3D:
                     print("Quitting!")
                     exiting = True
                 elif event.type == pygame.KEYDOWN:
-                    if self.has_won:
+                    if self.p1_has_won or self.p2_has_won:
                         print("Congratulations, you won!")
                         print("Thank you for playing!")
                         exiting = True
@@ -671,7 +641,7 @@ class GraphicsProgram3D:
                     if event.key == K_g:
                         self.G_key_down = False
             
-            if self.has_won:
+            if self.p1_has_won or self.p2_has_won:
                 self.display_victory_screen()
             else:
                 self.update()
