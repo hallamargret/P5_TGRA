@@ -46,6 +46,7 @@ class GraphicsProgram3D:
         self.x_walls = []
         self.z_walls = []
         self.inner_walls = []
+        self.floor = GameObject(Vector(self.track_size/2, 0, self.track_size/2), Vector(0.0, 0.0, 0.0), Vector(self.track_size, 0.8, self.track_size), (0.39, 0.40, 0.42))
         self.radius = 1.5
         
         
@@ -95,6 +96,9 @@ class GraphicsProgram3D:
         self.end_cubes = [end_cube_1]
 
         self.finish_line_cube = GameObject(Vector(5.0, 0.0, 25.0), Vector(0.0, 0.0, 0.0), Vector(10.0, 0.81, 2.0), (1.0, 1.0, 1.0))
+        self.arrow_cube_1 = GameObject(Vector(25.0, 0.0, 45.0), Vector(0.0, 0.0, 0.0), Vector(5.0, 0.81, 2.0), (0.40, 0.41, 0.43))
+        self.arrow_cube_2 = GameObject(Vector(45.0, 0.0, 25.0), Vector(0.0, 0.0, 0.0), Vector(2.0, 0.81, 5.0), (0.40, 0.41, 0.43))
+        self.arrow_cube_3 = GameObject(Vector(25.0, 0.0, 5.0), Vector(0.0, 0.0, 0.0), Vector(5.0, 0.81, 2.0), (0.40, 0.41, 0.43))
 
         for cube in self.end_cubes:
             cube.add_behavior(Spin(cube))
@@ -108,6 +112,8 @@ class GraphicsProgram3D:
         self.texture_id01 = self.load_texture(sys.path[0] + "/images/crowd.png")
         self.texture_id02 = self.load_texture_rotate(sys.path[0] +"/images/crowd.png")
         self.texture_id03 = self.load_texture_rotate(sys.path[0] + "/images/finish_line.png")
+        self.texture_id04 = self.load_texture(sys.path[0] + "/images/White_Arrow.png")
+        self.texture_id05 = self.load_texture_rotate(sys.path[0] + "/images/White_Arrow.png")
         # self.texture_id01 = self.load_texture("dice.png")
         # surface = pygame.image.load("fence_tex.png")
         # tex_string = pygame.image.tostring(surface, "RGBA", 1)
@@ -174,15 +180,15 @@ class GraphicsProgram3D:
         self.inner_walls.append(Wall(Vector(25, (self.wall_height/8), 10), Vector(30, self.wall_height/2, 0.2), (0.753, 0.753, 0.753)))
 
 
-    def draw_maze_floor(self, color_list, translation_list, scale_list):
-        self.shader.set_material_diffuse(color_list[0], color_list[1], color_list[2])
-        self.model_matrix.push_matrix()
-        self.model_matrix.add_translation(translation_list[0], translation_list[1], translation_list[2])
-        self.model_matrix.add_scale(scale_list[0], scale_list[1], scale_list[2])
-        self.shader.set_model_matrix(self.model_matrix.matrix)
-        self.cube.set_verticies(self.shader)
-        self.cube.draw()
-        self.model_matrix.pop_matrix()
+    # def draw_maze_floor(self, color_list, translation_list, scale_list):
+    #     self.shader.set_material_diffuse(color_list[0], color_list[1], color_list[2])
+    #     self.model_matrix.push_matrix()
+    #     self.model_matrix.add_translation(translation_list[0], translation_list[1], translation_list[2])
+    #     self.model_matrix.add_scale(scale_list[0], scale_list[1], scale_list[2])
+    #     self.shader.set_model_matrix(self.model_matrix.matrix)
+    #     self.cube.set_verticies(self.shader)
+    #     self.cube.draw()
+    #     self.model_matrix.pop_matrix()
     
     '''Check if the player is colliding any walls or objects, if so it will handle it so the player will slide among the wall/object but not walk througt it'''
     def check_collision(self, wall, view_matrix):
@@ -355,14 +361,9 @@ class GraphicsProgram3D:
 
         self.shader.set_material_specular(0.75, 0.75, 0.75)
         self.shader.set_material_shininess(30)
-
         self.model_matrix.load_identity()
 
-        # The maze floor
-        color = [0.39, 0.40, 0.42]
-        translation_list = [self.track_size/2, 0, self.track_size/2]
-        scale_list = [self.track_size, 0.8, self.track_size]
-        self.draw_maze_floor(color, translation_list, scale_list)
+        self.floor.draw(self.cube, self.shader, self.model_matrix)
 
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, self.texture_id03)
@@ -374,6 +375,39 @@ class GraphicsProgram3D:
 
         self.finish_line_cube.draw(self.cube, self.shader, self.model_matrix)
 
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id04)
+        self.shader.set_diffuse_tex(0)
+        glActiveTexture(GL_TEXTURE1)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id04)
+        self.shader.set_spec_tex(1)
+        
+        self.arrow_cube_2.draw(self.cube, self.shader, self.model_matrix)
+
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id05)
+        self.shader.set_diffuse_tex(0)
+        glActiveTexture(GL_TEXTURE1)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id05)
+        
+
+        self.arrow_cube_1.draw(self.cube, self.shader, self.model_matrix)
+        self.arrow_cube_3.draw(self.cube, self.shader, self.model_matrix)
+        
+        
+
+        
+
+        # The maze floor
+        # color = [0.39, 0.40, 0.42]
+        # translation_list = [self.track_size/2, 0, self.track_size/2]
+        # scale_list = [self.track_size, 0.8, self.track_size]
+        # self.draw_maze_floor(color, translation_list, scale_list)
+
+        
+
+        
+
         # Walls of the maze
 
         glActiveTexture(GL_TEXTURE0)
@@ -382,6 +416,7 @@ class GraphicsProgram3D:
         glActiveTexture(GL_TEXTURE1)
         glBindTexture(GL_TEXTURE_2D, self.texture_id02)
         self.shader.set_spec_tex(1)
+        self.shader.set_using_texture(1.0)
         
 
         for wall in self.x_walls:
