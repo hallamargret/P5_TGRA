@@ -29,8 +29,8 @@ class GraphicsProgram3D:
         self.view_matrix_player1 = ViewMatrix()
         self.view_matrix_player2 = ViewMatrix()
         # We start in point 1,1,1 and look at the point in front of us 2,1,2
-        self.view_matrix_player1.look(Point(1, 2, 1), Point(10, 2, 2), Vector(0, 1, 0)) # Player 1
-        self.view_matrix_player2.look(Point(20, 2,1), Point(10, 2, 2), Vector(0, 1, 0)) # Player 2
+        self.view_matrix_player1.look(Point(7, 2, 23.0), Point(7, 2, 25.0), Vector(0, 1, 0)) # Player 1
+        self.view_matrix_player2.look(Point(3, 2, 23.0), Point(3, 2, 25.0), Vector(0, 1, 0)) # Player 2
 
         self.overview_matrix = ViewMatrix()
         # overview mode, when o is pressed on the keyboard we see the maze from above in point 10,25,10 which is straight up from the middle of the maze
@@ -78,21 +78,23 @@ class GraphicsProgram3D:
         self.flashlight = False
         self.map = True     #little viewport to see a map in the upper right corner, to turn on and off press p
     
-        self.car_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(self.view_matrix_player1.eye.x, self.car_height/2, self.view_matrix_player1.eye.z), Vector(0,0,0), Vector(3.0, self.car_height, 1.5), (1,0,0))
-        self.car_2 = GameObject(self.cube, self.shader, self.model_matrix, Vector(self.view_matrix_player2.eye.x, self.car_height/2, self.view_matrix_player2.eye.z), Vector(0,0,0), Vector(3.0, self.car_height, 1.5), (0,0,1))
+        self.car_1 = GameObject(Vector(self.view_matrix_player1.eye.x, self.car_height/2, self.view_matrix_player1.eye.z), Vector(0,0,0), Vector(1.5, self.car_height, 3.0), (1,0,0))
+        self.car_2 = GameObject(Vector(self.view_matrix_player2.eye.x, self.car_height/2, self.view_matrix_player2.eye.z), Vector(0,0,0), Vector(1.5, self.car_height, 3.0), (0,0,1))
 
         # Cubes that are moving in the maze, the player will collide on them, set as hindrance
-        moving_cube_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(14.0, 1.0, 2.0), Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), (1.0, 0.0, 0.0))
+        moving_cube_1 = GameObject(Vector(14.0, 1.0, 2.0), Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), (1.0, 0.0, 0.0))
     
 
         self.moving_cubes = [moving_cube_1]
 
         # Player should try to collect all of the end cubes, when all are collected the player will win the game
-        end_cube_1 = GameObject(self.cube, self.shader, self.model_matrix, Vector(18.0, 1.0, 18.0), Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), (1.0, 0.0, 1.0))
+        end_cube_1 = GameObject(Vector(18.0, 1.0, 18.0), Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), (1.0, 0.0, 1.0))
 
         self.current_end_cube = 0
 
         self.end_cubes = [end_cube_1]
+
+        self.finish_line_cube = GameObject(Vector(5.0, 0.0, 25.0), Vector(0.0, 0.0, 0.0), Vector(10.0, 0.81, 2.0), (1.0, 1.0, 1.0))
 
         for cube in self.end_cubes:
             cube.add_behavior(Spin(cube))
@@ -105,6 +107,7 @@ class GraphicsProgram3D:
 
         self.texture_id01 = self.load_texture(sys.path[0] + "/images/crowd.png")
         self.texture_id02 = self.load_texture_rotate(sys.path[0] +"/images/crowd.png")
+        self.texture_id03 = self.load_texture_rotate(sys.path[0] + "/images/finish_line.png")
         # self.texture_id01 = self.load_texture("dice.png")
         # surface = pygame.image.load("fence_tex.png")
         # tex_string = pygame.image.tostring(surface, "RGBA", 1)
@@ -361,6 +364,16 @@ class GraphicsProgram3D:
         scale_list = [self.track_size, 0.8, self.track_size]
         self.draw_maze_floor(color, translation_list, scale_list)
 
+        glActiveTexture(GL_TEXTURE0)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id03)
+        self.shader.set_diffuse_tex(0)
+        glActiveTexture(GL_TEXTURE1)
+        glBindTexture(GL_TEXTURE_2D, self.texture_id03)
+        self.shader.set_spec_tex(1)
+        self.shader.set_using_texture(1.0)
+
+        self.finish_line_cube.draw(self.cube, self.shader, self.model_matrix)
+
         # Walls of the maze
 
         glActiveTexture(GL_TEXTURE0)
@@ -369,7 +382,7 @@ class GraphicsProgram3D:
         glActiveTexture(GL_TEXTURE1)
         glBindTexture(GL_TEXTURE_2D, self.texture_id02)
         self.shader.set_spec_tex(1)
-        self.shader.set_using_texture(1.0)
+        
 
         for wall in self.x_walls:
             wall.draw(self.shader, self.model_matrix, self.cube)
@@ -390,18 +403,18 @@ class GraphicsProgram3D:
             wall.draw(self.shader, self.model_matrix, self.cube)
 
 
-        self.end_cubes[self.current_end_cube].draw()
+        self.end_cubes[self.current_end_cube].draw(self.cube, self.shader, self.model_matrix)
 
         
 
         for cube in self.moving_cubes:
-            cube.draw()
+            cube.draw(self.cube, self.shader, self.model_matrix)
 
         
         if player == 1:
-            self.car_2.draw()
+            self.car_2.draw(self.cube, self.shader, self.model_matrix)
         else:
-            self.car_1.draw()
+            self.car_1.draw(self.cube, self.shader, self.model_matrix)
         
         
 
@@ -510,41 +523,41 @@ class GraphicsProgram3D:
         self.create_victory_letters()
 
         for object in self.victory_letters:
-            object.draw()
+            object.draw(self.cube, self.shader, self.model_matrix)
 
         pygame.display.flip()
 
     def create_victory_letters(self):
         #Y
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(16.5, 1, 3.5), Vector(0, pi/4, 0), Vector(3, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(14, 1, 4.5), Vector(0, 0, 0), Vector(2.5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(16.5, 1, 5.5), Vector(0, -pi/4, 0), Vector(3, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(16.5, 1, 3.5), Vector(0, pi/4, 0), Vector(3, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(14, 1, 4.5), Vector(0, 0, 0), Vector(2.5, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(16.5, 1, 5.5), Vector(0, -pi/4, 0), Vector(3, 1, 1), (0.5, 0.0, 0.0)))
         #O
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(15, 1, 9), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(15, 1, 12), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(17, 1, 10.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(13, 1, 10.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(15, 1, 9), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(15, 1, 12), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(17, 1, 10.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(13, 1, 10.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
         #U
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(15, 1, 15), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(15, 1, 18), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(13, 1, 16.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(15, 1, 15), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(15, 1, 18), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(13, 1, 16.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
         #W
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(7, 1, 3), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(5, 1, 3.5), Vector(0, 0, 0), Vector(1, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(6, 1, 4.25), Vector(0, -pi/6, 0), Vector(3, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(6, 1, 5.75), Vector(0, pi/6, 0), Vector(3, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(7, 1, 7), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(5, 1, 6.5), Vector(0, 0, 0), Vector(1, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(7, 1, 5), Vector(0, 0, 0), Vector(1, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(7, 1, 3), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(5, 1, 3.5), Vector(0, 0, 0), Vector(1, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(6, 1, 4.25), Vector(0, -pi/6, 0), Vector(3, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(6, 1, 5.75), Vector(0, pi/6, 0), Vector(3, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(7, 1, 7), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(5, 1, 6.5), Vector(0, 0, 0), Vector(1, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(7, 1, 5), Vector(0, 0, 0), Vector(1, 1, 1), (0.5, 0.0, 0.0)))
         #O
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(7, 1, 9), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(7, 1, 12), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(9, 1, 10.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(5, 1, 10.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(7, 1, 9), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(7, 1, 12), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(9, 1, 10.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(5, 1, 10.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
         #N
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(7, 1, 15), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(7, 1, 18), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(self.cube, self.shader, self.model_matrix, Vector(7, 1, 16.5), Vector(0, pi/5, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(7, 1, 15), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(7, 1, 18), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(7, 1, 16.5), Vector(0, pi/5, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
 
 
     def program_loop(self):
