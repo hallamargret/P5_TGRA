@@ -348,7 +348,6 @@ class GraphicsProgram3D:
     def display_player(self, view_matrix, player):
         self.shader.set_view_matrix(view_matrix.get_matrix())
         self.shader.set_eye_position(view_matrix.eye)
-        #print(f"Player {player}, is at eye position {view_matrix.eye}")
 
         # first light  (positional)
         #self.shader.set_light_pos_diff_spec(0, Point(25, 40, 25), (0.8, 0.8, 0.8), (0.2, 0.2, 0.2), 1.0)
@@ -357,17 +356,28 @@ class GraphicsProgram3D:
         # self.shader.set_light_specular(0.4, 0.4, 0.4)
         
         # # second light (direcionsl)
-        self.shader.set_light_pos_diff_spec(1, Vector(1, 0, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
+        # self.shader.set_light_pos_diff_spec(1, Vector(1, 0, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
 
-        self.shader.set_light_pos_diff_spec(2, Vector(0, 0, 1), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
+        # self.shader.set_light_pos_diff_spec(2, Vector(0, 0, 1), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
 
-        self.shader.set_light_pos_diff_spec(0, Vector(0, 0, -1), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
+        # self.shader.set_light_pos_diff_spec(0, Vector(0, 0, -1), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
 
-        self.shader.set_light_pos_diff_spec(3, Vector(-1, 0, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
+        # self.shader.set_light_pos_diff_spec(3, Vector(-1, 0, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
 
         
-        self.shader.set_light_pos_diff_spec(4, Vector(0, 1, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
+        # self.shader.set_light_pos_diff_spec(4, Vector(0, 1, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
         
+
+        self.shader.set_light_pos_diff_spec(1, Point(50, 10, 25), (0.6, 0.6, 0.6), (0.4, 0.4, 0.4), 1.0)
+
+        self.shader.set_light_pos_diff_spec(2, Point(0, 10, 25), (0.8, 0.6, 0.6), (0.4, 0.4, 0.4), 1.0)
+
+        self.shader.set_light_pos_diff_spec(0, Point(25, 10, 50), (0.6, 0.6, 0.6), (0.4, 0.4, 0.4), 1.0)
+
+        self.shader.set_light_pos_diff_spec(3, Point(25, 10, 0), (0.6, 0.6, 0.6), (0.4, 0.4, 0.4), 1.0)
+
+        
+        self.shader.set_light_pos_diff_spec(4, Vector(0, 1, 0), (0.8, 0.8, 0.8), (0.0, 0.0, 0.0), 0.0)
         # # third light (positional)
         # self.shader.set_light_pos_diff_spec(2, Point(5, 40, 25), (0.8, 0.8, 0.8), (0.2, 0.2, 0.2), 1.0)
         
@@ -554,7 +564,7 @@ class GraphicsProgram3D:
     def display(self):
         glEnable(GL_DEPTH_TEST)
 
-        glClearColor(0.0, 0.2, 0.8, 1.0)    #color of space (sky)
+        glClearColor(0.447, 0.737, 0.831, 1.0)    #color of space (sky)
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
         self.shader.set_material_diffuse(Color(1.0, 1.0, 1.0))
