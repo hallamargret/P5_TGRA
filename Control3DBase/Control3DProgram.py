@@ -255,10 +255,10 @@ class GraphicsProgram3D:
                             self.p1_has_won = True
                 else:
                     if self.line_crossed_p2 == False:
-                        print(f"Player 2 eye z is {view_matrix.eye.z}")
-                        print(f"Line crossed p2 is now {self.line_crossed_p2}")
+                    #     print(f"Player 2 eye z is {view_matrix.eye.z}")
+                    #     print(f"Line crossed p2 is now {self.line_crossed_p2}")
                         self.line_crossed_p2 = True
-                        print(f"Line crossed p2 is now {self.line_crossed_p2}")
+                        # print(f"Line crossed p2 is now {self.line_crossed_p2}")
                         if self.round_p2 < 2:
                             self.round_p2 += 1
                         else:
