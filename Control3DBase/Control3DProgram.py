@@ -60,6 +60,7 @@ class GraphicsProgram3D:
 
         self.cube = Cube()
         self.obj_model = ojb_3D_loading.load_obj_file(sys.path[0] + "/models", "cloud.obj")
+        self.cup = ojb_3D_loading.load_obj_file(sys.path[0] + "/models", "goblet.obj")
 
         self.clock = pygame.time.Clock()
         self.clock.tick()
@@ -465,6 +466,17 @@ class GraphicsProgram3D:
         #     self.model_matrix.pop_matrix()
 
             #self.obj_model.draw(self.shader)
+
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(25.0, 2.5, 25.0)
+        self.model_matrix.add_scale(30,30,30)
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        #self.obj_model.set_mesh_material()
+        cup_material = Material(Color(1.0,0.843,0.0), Color(0.5,0.5,0.5), 0.7)
+        self.cup.add_material(59, cup_material)
+        self.cup.material_key_test(59)
+        self.cup.draw(self.shader)
+        self.model_matrix.pop_matrix()
 
         self.model_matrix.push_matrix()
         self.model_matrix.add_translation(25.0, 15.0, 5.0)
