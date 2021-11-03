@@ -341,8 +341,8 @@ class GraphicsProgram3D:
 
         self.check_finish_line(self.view_matrix_player1, 1)
         self.check_finish_line(self.view_matrix_player2, 2)
-        print(f"Player 1 has finished {self.round_p1} rounds!")
-        print(f"Player 2 has finished {self.round_p2} rounds!")
+        # print(f"Player 1 has finished {self.round_p1} rounds!")
+        # print(f"Player 2 has finished {self.round_p2} rounds!")
     
 
     def display_player(self, view_matrix, player):
