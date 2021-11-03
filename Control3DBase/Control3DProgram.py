@@ -70,6 +70,7 @@ class GraphicsProgram3D:
         self.cube = Cube()
         self.obj_model = ojb_3D_loading.load_obj_file(sys.path[0] + "/models", "cloud.obj")
         self.cup = ojb_3D_loading.load_obj_file(sys.path[0] + "/models", "goblet.obj")
+        self.shere = ojb_3D_loading.load_obj_file(sys.path[0] + "/models", "smooth_sphere.obj")
 
         self.clock = pygame.time.Clock()
         self.clock.tick()
@@ -100,7 +101,6 @@ class GraphicsProgram3D:
 
         self.moving_cubes = [moving_cube_1, moving_cube_2]
 
-        # Player should try to collect all of the end cubes, when all are collected the player will win the game
         end_cube_1 = GameObject(Vector(18.0, 1.0, 18.0), Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), (1.0, 0.0, 1.0))
 
         self.current_end_cube = 0
@@ -350,52 +350,17 @@ class GraphicsProgram3D:
         self.shader.set_eye_position(view_matrix.eye)
 
         # first light  (positional)
-        #self.shader.set_light_pos_diff_spec(0, Point(25, 40, 25), (0.8, 0.8, 0.8), (0.2, 0.2, 0.2), 1.0)
-        # self.shader.set_light_position(Point(25, 25, 25))
-        # self.shader.set_light_diffuse(0.8, 0.8, 0.8)
-        # self.shader.set_light_specular(0.4, 0.4, 0.4)
-        
-        # # second light (direcionsl)
-        # self.shader.set_light_pos_diff_spec(1, Vector(1, 0, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
-
-        # self.shader.set_light_pos_diff_spec(2, Vector(0, 0, 1), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
-
-        # self.shader.set_light_pos_diff_spec(0, Vector(0, 0, -1), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
-
-        # self.shader.set_light_pos_diff_spec(3, Vector(-1, 0, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
-
-        
-        # self.shader.set_light_pos_diff_spec(4, Vector(0, 1, 0), (1.0, 1.0, 1.0), (0.2, 0.2, 0.2), 0.0)
-        
-
         self.shader.set_light_pos_diff_spec(1, Point(50, 10, 25), (0.6, 0.6, 0.6), (0.4, 0.4, 0.4), 1.0)
-
+        # second light  (positional)
         self.shader.set_light_pos_diff_spec(2, Point(0, 10, 25), (0.8, 0.6, 0.6), (0.4, 0.4, 0.4), 1.0)
-
+        # third light  (positional)
         self.shader.set_light_pos_diff_spec(0, Point(25, 10, 50), (0.6, 0.6, 0.6), (0.4, 0.4, 0.4), 1.0)
-
+        # fourth light  (positional)
         self.shader.set_light_pos_diff_spec(3, Point(25, 10, 0), (0.6, 0.6, 0.6), (0.4, 0.4, 0.4), 1.0)
 
         
         self.shader.set_light_pos_diff_spec(4, Vector(0, 1, 0), (0.8, 0.8, 0.8), (0.0, 0.0, 0.0), 0.0)
-        # # third light (positional)
-        # self.shader.set_light_pos_diff_spec(2, Point(5, 40, 25), (0.8, 0.8, 0.8), (0.2, 0.2, 0.2), 1.0)
-        
-        # # fourth light (positional)
-        # self.shader.set_light_pos_diff_spec(3, Point(45, 40, 25), (0.8, 0.8, 0.8), (0.2, 0.2, 0.2), 1.0)
-
-        # # fifth light
-        # self.shader.set_light_pos_diff_spec(4, Point(25, 40, 5), (0.8, 0.8, 0.8), (0.2, 0.2, 0.2), 1.0)
-
-        # fifth light, flashlight (directional). Turned on when space has been pressed, turns off when space is pressed again.
-        # if self.flashlight:
-        #     self.shader.set_light_pos_diff_spec(4, view_matrix.n, (0.5, 0.5, 0.1), (0.3, 0.3, 0.3), 0.0)
-        # else:
-        #     self.shader.set_light_pos_diff_spec(4, view_matrix.n, (0.0, 0.0, 0.0), (0.0, 0.0, 0.0), 0.0)
-
-        # fifth light directional fixed position not used but can be replaced for the flashlight (or added to the list but then need some modifycations in the simple3D.vert file)
-        #self.shader.set_light_pos_diff_spec(4, Point(1, 1, 1), (0.6, 0.6, 0.6), (0.5, 0.5, 0.5), 0.0)
-
+    
         self.shader.set_material_specular(Color(0.75, 0.75, 0.75))
         self.shader.set_material_shininess(30)
         self.model_matrix.load_identity()
@@ -439,7 +404,7 @@ class GraphicsProgram3D:
         self.arrow_cube_3.draw(self.cube, self.shader, self.model_matrix)
     
 
-        # Walls of the maze
+        # Walls of the track
 
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, self.texture_id02)
@@ -453,7 +418,6 @@ class GraphicsProgram3D:
         for wall in self.x_walls:
             wall.draw(self.shader, self.model_matrix, self.cube)
 
-        #self.obj_model.draw(self.shader)
 
         glActiveTexture(GL_TEXTURE0)
         glBindTexture(GL_TEXTURE_2D, self.texture_id01)
@@ -494,17 +458,47 @@ class GraphicsProgram3D:
 
             #self.obj_model.draw(self.shader)
 
+        # Victory cup in the middle of the track
         self.model_matrix.push_matrix()
         self.model_matrix.add_translation(25.0, 2.5, 25.0)
         self.model_matrix.add_scale(30,30,30)
         self.shader.set_model_matrix(self.model_matrix.matrix)
-        #self.obj_model.set_mesh_material()
         cup_material = Material(Color(1.0,0.843,0.0), Color(0.5,0.5,0.5), 0.7)
         self.cup.add_material(59, cup_material)
         self.cup.material_key_test(59)
         self.cup.draw(self.shader)
         self.model_matrix.pop_matrix()
 
+        #Sphere in corner of track
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(0.4, 7, 49.6)
+        self.model_matrix.add_scale(1,1,1)
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        self.shere.draw(self.shader)
+        self.model_matrix.pop_matrix()
+        #Sphere in corner of track
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(49.6, 7, 49.6)
+        self.model_matrix.add_scale(1,1,1)
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        self.shere.draw(self.shader)
+        self.model_matrix.pop_matrix()
+        #Sphere in corner of track
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(49.6, 7, 0.4)
+        self.model_matrix.add_scale(1,1,1)
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        self.shere.draw(self.shader)
+        self.model_matrix.pop_matrix()
+        #Sphere in corner of track
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(0.4, 7, 0.4)
+        self.model_matrix.add_scale(1,1,1)
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        self.shere.draw(self.shader)
+        self.model_matrix.pop_matrix()
+
+        #clouds in the sky that move in bezier motion
         self.model_matrix.push_matrix()
         self.model_matrix.add_translation(self.destination_cloud_1.x, self.destination_cloud_1.y, self.destination_cloud_1.z)
         self.model_matrix.add_scale(0.01, 0.01, 0.01)
@@ -571,37 +565,19 @@ class GraphicsProgram3D:
 
         glViewport(0, 375, 1000, 375)
 
-        # glActiveTexture(GL_TEXTURE0)
-        # glBindTexture(GL_TEXTURE_2D, self.texture_id01)
-        # self.shader.set_diffuse_tex(0)
-        # glActiveTexture(GL_TEXTURE1)
-        # glBindTexture(GL_TEXTURE_2D, self.texture_id01)
-        # self.shader.set_spec_tex(1)
-
 
         self.projection_matrix.set_perspective((self.fov), (1000 / 750), self.near_plane, self.far_plane)
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
 
         self.display_player(self.view_matrix_player1, 1)
 
-        # View the maze from above to see the whole maze. Not able to move while in overview mode, only look.
+        # View the track from above to see the whole track.
         if self.overview:
             self.shader.set_view_matrix(self.overview_matrix.get_matrix())
             self.shader.set_eye_position(self.overview_matrix.eye)
-        # Game mode (first person view), viewing the matrix as the player. Move (walk forward, to the right, left and backwards) and look around for end cubes.
-        # else:
-        #     #player 1
-        #     self.shader.set_view_matrix(self.view_matrix_player1.get_matrix())
-        #     self.shader.set_eye_position(self.view_matrix_player1.eye)
-
+        
         
         glViewport(0, 0, 1000, 375)
-        # glActiveTexture(GL_TEXTURE0)
-        # glBindTexture(GL_TEXTURE_2D, self.texture_id02)
-        # self.shader.set_diffuse_tex(0)
-        # glActiveTexture(GL_TEXTURE1)
-        # glBindTexture(GL_TEXTURE_2D, self.texture_id02)
-        # self.shader.set_spec_tex(1)
 
         self.projection_matrix.set_perspective((self.fov), (1000 / 750), self.near_plane, self.far_plane)
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
@@ -614,8 +590,8 @@ class GraphicsProgram3D:
         pygame.display.flip()
     
 
-    '''When the player has collected all four cubes then the player has won and the message "YOU WON" will display.
-    Then when the player presses any key, the game will quit.'''
+    '''When the first player, either player 1 or player 2, has droven 3 laps in track then the player has won and the message "P1 WON" or "P2 WON" will display.
+    Then when either player presses any key, the game will quit.'''
     def display_victory_screen(self):
         glEnable(GL_DEPTH_TEST)
 
@@ -635,11 +611,6 @@ class GraphicsProgram3D:
 
         self.winning_screen_base.draw(self.cube, self.shader, self.model_matrix)
 
-        # color = [0.0, 0.0, 0.8]
-        # translation_list = [self.track_size/2, 0, self.track_size/2]
-        # scale_list = [self.track_size, 0.8, self.track_size]
-        # self.draw_maze_floor(color, translation_list, scale_list)
-
         self.create_victory_letters()
 
         for object in self.victory_letters:
@@ -648,19 +619,6 @@ class GraphicsProgram3D:
         pygame.display.flip()
 
     def create_victory_letters(self):
-        #Y
-        # self.victory_letters.append(GameObject(Vector(16.5, 1, 3.5), Vector(0, pi/4, 0), Vector(3, 1, 1), (0.5, 0.0, 0.0)))
-        # self.victory_letters.append(GameObject(Vector(14, 1, 4.5), Vector(0, 0, 0), Vector(2.5, 1, 1), (0.5, 0.0, 0.0)))
-        # self.victory_letters.append(GameObject(Vector(16.5, 1, 5.5), Vector(0, -pi/4, 0), Vector(3, 1, 1), (0.5, 0.0, 0.0)))
-        # #O
-        # self.victory_letters.append(GameObject(Vector(15, 1, 9), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        # self.victory_letters.append(GameObject(Vector(15, 1, 12), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        # self.victory_letters.append(GameObject(Vector(17, 1, 10.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
-        # self.victory_letters.append(GameObject(Vector(13, 1, 10.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
-        # #U
-        # self.victory_letters.append(GameObject(Vector(15, 1, 15), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        # self.victory_letters.append(GameObject(Vector(15, 1, 18), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        # self.victory_letters.append(GameObject(Vector(13, 1, 16.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
         #P
         self.victory_letters.append(GameObject(Vector(14, 1, 4.5), Vector(0,0,0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
         self.victory_letters.append(GameObject(Vector(16.5, 1, 5.5), Vector(0,0,0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
