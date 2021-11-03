@@ -36,7 +36,7 @@ class GraphicsProgram3D:
 
         self.overview_matrix = ViewMatrix()
         # overview mode, when o is pressed on the keyboard we see the maze from above in point 10,25,10 which is straight up from the middle of the maze
-        self.overview_matrix.look(Point(25, 50, 25), Point(26, 1, 26), Vector(0, 1, 0))
+        self.overview_matrix.look(Point(10, 25, 10), Point(11, 1, 10), Vector(0, 1, 0))
 
         self.wall_height = 6
         self.track_size = 50
@@ -49,6 +49,7 @@ class GraphicsProgram3D:
         self.z_walls = []
         self.inner_walls = []
         self.floor = GameObject(Vector(self.track_size/2, 0, self.track_size/2), Vector(0.0, 0.0, 0.0), Vector(self.track_size, 0.8, self.track_size), (0.39, 0.40, 0.42))
+        self.winning_screen_base = GameObject(Vector(10, 0, 10), Vector(0.0, 0.0, 0.0), Vector(20, 0.8, 20), (0.39, 0.40, 0.42))
         self.radius = 1.5
         
         
@@ -123,6 +124,12 @@ class GraphicsProgram3D:
         self.texture_id04 = self.load_texture(sys.path[0] + "/images/White_Arrow.png")
         self.texture_id05 = self.load_texture_rotate(sys.path[0] + "/images/White_Arrow.png", -90)
         self.texture_id06 = self.load_texture_rotate(sys.path[0] + "/images/White_Arrow.png", 90)
+
+
+        self.line_crossed_p1 = True
+        self.line_crossed_p2 = True
+        self.round_p1 = 0
+        self.round_p2 = 0
 
 
     def load_texture(self, path_str):
@@ -224,14 +231,34 @@ class GraphicsProgram3D:
             self.check_collision(cube, self.view_matrix_player2)
 
 
-    # TODO taka þetta út?
-    # def check_spinning_cube_collision(self, view_matrix):
-    #     distance_vector = view_matrix.eye - self.end_cubes[self.current_end_cube].translation
-    #     if distance_vector.__len__() < (self.radius + 0.3):
-    #         if self.current_end_cube < (len(self.end_cubes) - 1):
-    #             self.current_end_cube += 1
-    #         else:
-    #             self.has_won = True
+    def check_finish_line(self, view_matrix, player):
+        if 0 <= view_matrix.eye.x <= 10:
+            if view_matrix.eye.z < 25:
+                if player == 1:
+                    self.line_crossed_p1 = False
+                else:
+                    self.line_crossed_p2 = False
+            if view_matrix.eye.z >= 25:
+                if player == 1:
+                    if self.line_crossed_p1 == False:
+                        self.line_crossed_p1 = True
+                        if self.round_p1 < 2:
+                            self.round_p1 += 1
+                        else:
+                            self.p1_has_won = True
+                else:
+                    if self.line_crossed_p2 == False:
+                        print(f"Player 2 eye z is {view_matrix.eye.z}")
+                        print(f"Line crossed p2 is now {self.line_crossed_p2}")
+                        self.line_crossed_p2 = True
+                        print(f"Line crossed p2 is now {self.line_crossed_p2}")
+                        if self.round_p2 < 2:
+                            self.round_p2 += 1
+                        else:
+                            self.p2_has_won = True
+                
+
+
 
     
 
@@ -287,15 +314,17 @@ class GraphicsProgram3D:
             self.check_collision(wall, self.view_matrix_player1)
             self.check_collision(wall, self.view_matrix_player2)
 
-        #self.check_moving_cube_collision()
-        #self.check_spinning_cube_collision(self.view_matrix_player1)
-        #self.check_spinning_cube_collision(self.view_matrix_player2)
 
         self.car_1.translation = Vector(self.view_matrix_player1.eye.x, self.car_height/2, self.view_matrix_player1.eye.z)
         self.car_2.translation = Vector(self.view_matrix_player2.eye.x, self.car_height/2, self.view_matrix_player2.eye.z)
 
         self.check_collision(self.car_1, self.view_matrix_player2)
         self.check_collision(self.car_2, self.view_matrix_player1)
+
+        self.check_finish_line(self.view_matrix_player1, 1)
+        self.check_finish_line(self.view_matrix_player2, 2)
+        print(f"Player 1 has finished {self.round_p1} rounds!")
+        print(f"Player 2 has finished {self.round_p2} rounds!")
     
 
     def display_player(self, view_matrix, player):
@@ -565,10 +594,12 @@ class GraphicsProgram3D:
 
         self.model_matrix.load_identity()
 
-        color = [0.0, 0.0, 0.8]
-        translation_list = [self.track_size/2, 0, self.track_size/2]
-        scale_list = [self.track_size, 0.8, self.track_size]
-        self.draw_maze_floor(color, translation_list, scale_list)
+        self.winning_screen_base.draw(self.cube, self.shader, self.model_matrix)
+
+        # color = [0.0, 0.0, 0.8]
+        # translation_list = [self.track_size/2, 0, self.track_size/2]
+        # scale_list = [self.track_size, 0.8, self.track_size]
+        # self.draw_maze_floor(color, translation_list, scale_list)
 
         self.create_victory_letters()
 
@@ -579,18 +610,34 @@ class GraphicsProgram3D:
 
     def create_victory_letters(self):
         #Y
-        self.victory_letters.append(GameObject(Vector(16.5, 1, 3.5), Vector(0, pi/4, 0), Vector(3, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(Vector(14, 1, 4.5), Vector(0, 0, 0), Vector(2.5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(Vector(16.5, 1, 5.5), Vector(0, -pi/4, 0), Vector(3, 1, 1), (0.5, 0.0, 0.0)))
-        #O
-        self.victory_letters.append(GameObject(Vector(15, 1, 9), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(Vector(15, 1, 12), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(Vector(17, 1, 10.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(Vector(13, 1, 10.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
-        #U
-        self.victory_letters.append(GameObject(Vector(15, 1, 15), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(Vector(15, 1, 18), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
-        self.victory_letters.append(GameObject(Vector(13, 1, 16.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
+        # self.victory_letters.append(GameObject(Vector(16.5, 1, 3.5), Vector(0, pi/4, 0), Vector(3, 1, 1), (0.5, 0.0, 0.0)))
+        # self.victory_letters.append(GameObject(Vector(14, 1, 4.5), Vector(0, 0, 0), Vector(2.5, 1, 1), (0.5, 0.0, 0.0)))
+        # self.victory_letters.append(GameObject(Vector(16.5, 1, 5.5), Vector(0, -pi/4, 0), Vector(3, 1, 1), (0.5, 0.0, 0.0)))
+        # #O
+        # self.victory_letters.append(GameObject(Vector(15, 1, 9), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        # self.victory_letters.append(GameObject(Vector(15, 1, 12), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        # self.victory_letters.append(GameObject(Vector(17, 1, 10.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
+        # self.victory_letters.append(GameObject(Vector(13, 1, 10.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
+        # #U
+        # self.victory_letters.append(GameObject(Vector(15, 1, 15), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        # self.victory_letters.append(GameObject(Vector(15, 1, 18), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        # self.victory_letters.append(GameObject(Vector(13, 1, 16.5), Vector(0, 0, 0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
+        #P
+        self.victory_letters.append(GameObject(Vector(14, 1, 4.5), Vector(0,0,0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(16.5, 1, 5.5), Vector(0,0,0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(14, 1, 5.5), Vector(0,0,0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
+        self.victory_letters.append(GameObject(Vector(15.25, 1, 7), Vector(0,0,0), Vector(2, 1, 1), (0.5, 0.0, 0.0)))
+        #1
+        if self.p1_has_won == True:
+            self.victory_letters.append(GameObject(Vector(14, 1, 10.5), Vector(0,0,0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
+        #2
+        elif self.p2_has_won == True:
+            self.victory_letters.append(GameObject(Vector(16.5, 1, 12), Vector(0,0,0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
+            self.victory_letters.append(GameObject(Vector(14, 1, 12), Vector(0,0,0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
+            self.victory_letters.append(GameObject(Vector(11.5, 1, 12), Vector(0,0,0), Vector(1, 1, 3), (0.5, 0.0, 0.0)))
+            self.victory_letters.append(GameObject(Vector(15.25, 1, 13), Vector(0,0,0), Vector(2, 1, 1), (0.5, 0.0, 0.0)))
+            self.victory_letters.append(GameObject(Vector(12.75, 1, 11), Vector(0,0,0), Vector(2, 1, 1), (0.5, 0.0, 0.0)))
+
         #W
         self.victory_letters.append(GameObject(Vector(7, 1, 3), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
         self.victory_letters.append(GameObject(Vector(5, 1, 3.5), Vector(0, 0, 0), Vector(1, 1, 1), (0.5, 0.0, 0.0)))
