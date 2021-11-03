@@ -48,9 +48,18 @@ class GraphicsProgram3D:
         self.x_walls = []
         self.z_walls = []
         self.inner_walls = []
+        self.bezier_points_cloud_1 = [Point(25,15,5), Point(45,15,25), Point(25,15,45), Point(5,15,25), Point(25,15,5)]
+        self.bezier_points_cloud_2 = [Point(25,15,45), Point(5,15,25), Point(25,15,5), Point(45,15,25), Point(25,15,45)]
+
         self.floor = GameObject(Vector(self.track_size/2, 0, self.track_size/2), Vector(0.0, 0.0, 0.0), Vector(self.track_size, 0.8, self.track_size), (0.39, 0.40, 0.42))
         self.winning_screen_base = GameObject(Vector(10, 0, 10), Vector(0.0, 0.0, 0.0), Vector(20, 0.8, 20), (0.39, 0.40, 0.42))
         self.radius = 1.5
+
+        self.current_time = 0
+        self.end_time = 30
+        self.start_time = 0
+        self.destination_cloud_1 = Point(25,15,5)
+        self.destination_cloud_2 = Point(25,15,45)
         
         
         self.projection_matrix = ProjectionMatrix()
@@ -264,6 +273,17 @@ class GraphicsProgram3D:
         delta_time = self.clock.tick() / 1000.0
 
         self.angle += pi * delta_time
+        
+        self.current_time += self.clock.get_rawtime() / 1000.0
+        if self.current_time > self.end_time:
+            self.current_time = 0
+        
+        t = self.t(self.current_time, self.end_time, self.start_time)
+
+        self.destination_cloud_1 = self.rec_lerp(self.bezier_points_cloud_1, t)
+        self.destination_cloud_2 = self.rec_lerp(self.bezier_points_cloud_2, t)
+        
+
 
         if not self.overview:
             if self.W_key_down:
@@ -476,7 +496,7 @@ class GraphicsProgram3D:
         self.model_matrix.pop_matrix()
 
         self.model_matrix.push_matrix()
-        self.model_matrix.add_translation(25.0, 15.0, 5.0)
+        self.model_matrix.add_translation(self.destination_cloud_1.x, self.destination_cloud_1.y, self.destination_cloud_1.z)
         self.model_matrix.add_scale(0.01, 0.01, 0.01)
         self.shader.set_model_matrix(self.model_matrix.matrix)
         #self.obj_model.set_mesh_material()
@@ -488,7 +508,7 @@ class GraphicsProgram3D:
         self.model_matrix.pop_matrix()
 
         self.model_matrix.push_matrix()
-        self.model_matrix.add_translation(25.0, 15.0, 45.0)
+        self.model_matrix.add_translation(self.destination_cloud_2.x, self.destination_cloud_2.y, self.destination_cloud_2.z)
         self.model_matrix.add_scale(0.01, 0.01, 0.01)
         self.shader.set_model_matrix(self.model_matrix.matrix)
         #self.obj_model.set_mesh_material()
@@ -665,6 +685,23 @@ class GraphicsProgram3D:
         self.victory_letters.append(GameObject(Vector(7, 1, 18), Vector(0, 0, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
         self.victory_letters.append(GameObject(Vector(7, 1, 16.5), Vector(0, pi/5, 0), Vector(5, 1, 1), (0.5, 0.0, 0.0)))
 
+    def lerp(self, p1, p2, t):
+        the_lerp = p1 *(1-t) + p2 * t
+        return the_lerp
+
+    def t(self, curr, end, start):
+        t = (curr - start)/(end - start)
+        return t
+    
+    def rec_lerp(self, points_list, t):
+        if len(points_list) == 1:
+            return points_list[0]
+
+        lerp_point_list = []
+        for i in range(len(points_list)):
+            if i != len(points_list)-1:
+                lerp_point_list.append(self.lerp(points_list[i], points_list[i+1], t))
+        return self.rec_lerp(lerp_point_list, t)
 
     def program_loop(self):
         exiting = False

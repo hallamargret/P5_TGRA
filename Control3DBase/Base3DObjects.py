@@ -20,6 +20,10 @@ class Point:
     def __sub__(self, other):
         return Vector(self.x - other.x, self.y - other.y, self.z - other.z)
     
+    def __mul__(self, numb):
+        return Point(self.x * numb, self.y * numb, self.z * numb)
+    
+    
     def __str__(self):
         return "(" + str(self.x) + ", " + str(self.y) + ", " + str(self.z) + ")"
 
