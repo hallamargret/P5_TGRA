@@ -80,9 +80,6 @@ class GraphicsProgram3D:
         self.T_key_down = False
         self.G_key_down = False
         self.overview = False   # View the maze from above
-        # The flashlight is turned off to begin with, to turn it on and off press space
-        self.flashlight = False
-        self.map = True     #little viewport to see a map in the upper right corner, to turn on and off press p
     
         self.car_1 = GameObject(Vector(self.view_matrix_player1.eye.x, self.car_height/2, self.view_matrix_player1.eye.z), Vector(0,0,0), Vector(1.5, self.car_height, 3.0), (1,0,0))
         self.car_2 = GameObject(Vector(self.view_matrix_player2.eye.x, self.car_height/2, self.view_matrix_player2.eye.z), Vector(0,0,0), Vector(1.5, self.car_height, 3.0), (0,0,1))
@@ -707,21 +704,6 @@ class GraphicsProgram3D:
                             self.T_key_down = True
                         if event.key == K_g:
                             self.G_key_down = True
-                        if event.key == K_o:
-                            if self.overview:
-                                self.overview = False
-                            else:
-                                self.overview = True
-                        if event.key == K_SPACE:
-                            if self.flashlight:
-                                self.flashlight = False
-                            else:
-                                self.flashlight = True
-                        if event.key == K_p:
-                            if self.map:
-                                self.map = False
-                            else:
-                                self.map = True
 
                 elif event.type == pygame.KEYUP:
                     if event.key == K_UP:
