@@ -58,7 +58,7 @@ class GraphicsProgram3D:
         self.shader.set_projection_matrix(self.projection_matrix.get_matrix())
 
         self.cube = Cube()
-        self.obj_model = ojb_3D_loading.load_obj_file(sys.path[0] + "/models", "smooth_sphere.obj")
+        self.obj_model = ojb_3D_loading.load_obj_file(sys.path[0] + "/models", "cloud.obj")
 
         self.clock = pygame.time.Clock()
         self.clock.tick()
@@ -86,8 +86,8 @@ class GraphicsProgram3D:
         self.car_2 = GameObject(Vector(self.view_matrix_player2.eye.x, self.car_height/2, self.view_matrix_player2.eye.z), Vector(0,0,0), Vector(1.5, self.car_height, 3.0), (0,0,1))
 
         # Cubes that are moving in the maze, the player will collide on them, set as hindrance
-        moving_cube_1 = GameObject(Vector(25.0, 10.0, 2.0), Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), (1.0, 0.0, 0.0))
-        moving_cube_2 = GameObject(Vector(25.0, 10.0, 40.0), Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), (1.0, 0.0, 0.0))
+        moving_cube_1 = GameObject(Vector(25.0, 15.0, 2.0), Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), (1.0, 0.0, 0.0))
+        moving_cube_2 = GameObject(Vector(25.0, 15.0, 40.0), Vector(0.0, 0.0, 0.0), Vector(1.0, 1.0, 1.0), (1.0, 0.0, 0.0))
     
 
         self.moving_cubes = [moving_cube_1, moving_cube_2]
@@ -418,9 +418,46 @@ class GraphicsProgram3D:
         self.end_cubes[self.current_end_cube].draw(self.cube, self.shader, self.model_matrix)
         
 
-        for cube in self.moving_cubes:
-            cube.draw(self.cube, self.shader, self.model_matrix)
-            self.obj_model.draw(self.shader)
+        # for cube in self.moving_cubes:
+        #     cube.scale = Vector(0.5, 0.5,0.5)
+        #     cube.draw(self.cube, self.shader, self.model_matrix)
+
+        #     self.model_matrix.push_matrix()
+        #     self.model_matrix.add_translation(cube.translation.x, cube.translation.y, cube.translation.z)  ### --- ADD PROPER TRANSFORMATION OPERATIONS --- ###
+        #     # self.model_matrix.add_translation(cube.translation.x, cube.translation.y, cube.translation.z)
+        #     # self.model_matrix.add_rotate_x(cube.rotation.x)
+        #     # self.model_matrix.add_rotate_y(cube.rotation.y)
+        #     # self.model_matrix.add_rotate_z(cube.rotation.z)
+        #     self.model_matrix.add_scale(100, 100, 100)
+        #     self.shader.set_model_matrix(self.model_matrix.matrix)
+        #   #self.shader.set_material_diffuse(self.color)
+        #     #self.obj_model.set_verticies(self.shader)
+        #     self.obj_model.draw(self.shader)
+        #     self.model_matrix.pop_matrix()
+
+            #self.obj_model.draw(self.shader)
+
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(25.0, 15.0, 5.0)
+        self.model_matrix.add_scale(0.01, 0.01, 0.01)
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        #self.obj_model.set_mesh_material()
+        cloud_material = Material(Color(1.0,1.0,1.0), Color(0.5,0.5,0.5), 0.7)
+        self.obj_model.add_material(58, cloud_material)
+        self.obj_model.material_key_test(58)
+        #self.obj_model.set_mesh_material()
+        self.obj_model.draw(self.shader)
+        self.model_matrix.pop_matrix()
+
+        self.model_matrix.push_matrix()
+        self.model_matrix.add_translation(25.0, 15.0, 45.0)
+        self.model_matrix.add_scale(0.01, 0.01, 0.01)
+        self.shader.set_model_matrix(self.model_matrix.matrix)
+        #self.obj_model.set_mesh_material()
+        self.obj_model.draw(self.shader)
+        self.model_matrix.pop_matrix()
+
+            
 
         if player == 1:
             self.car_2.draw(self.cube, self.shader, self.model_matrix)

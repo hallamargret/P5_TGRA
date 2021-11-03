@@ -154,8 +154,8 @@ class Color:
 
 class Material:
     def __init__(self, diffuse = None, specular = None, shininess = None):
-        self.diffuse = Color(0.0, 0.0, 0.0) if diffuse == None else diffuse
-        self.specular = Color(0.0, 0.0, 0.0) if specular == None else specular
+        self.diffuse = Color(1.0, 1.0, 1.0) if diffuse == None else diffuse
+        self.specular = Color(1.0, 1.0, 1.0) if specular == None else specular
         self.shininess = 1 if shininess == None else shininess
 
 
@@ -181,6 +181,10 @@ class MeshModel:
 
     def add_material(self, mat_id, mat):
         self.materials[mat_id] = mat
+    
+    def material_key_test(self, material):
+        for mesh_id in self.mesh_materials.keys():
+            self.set_mesh_material(mesh_id, material)
     
     def set_opengl_buffers(self):
         for mesh_id in self.mesh_materials.keys():
